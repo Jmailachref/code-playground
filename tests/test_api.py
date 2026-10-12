@@ -10,6 +10,7 @@ os.environ.setdefault("DATABASE_URL", os.environ.get(
 ))
 os.environ.setdefault("QUEUE_NAME", "codeplay:test-jobs")
 os.environ.setdefault("API_KEYS", "ui:ui-key,other:other-key")
+os.environ.setdefault("UI_API_KEY", "ui-key")
 
 import json  # noqa: E402
 from pathlib import Path  # noqa: E402
@@ -214,3 +215,20 @@ def test_restricted_languages(client):
     )
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "language_not_allowed"
+
+
+def test_ui_proxy_forwards_allowed_calls_without_a_key(client):
+    problem = create_problem(client)
+    listed = client.get("/ui-api/problems")
+    assert listed.status_code == 200
+    assert listed.json()[0]["id"] == problem["id"]
+    run_id = client.post("/ui-api/runs", json={"language": "python", "source_code": "print(1)"}).json()["id"]
+    work_queue()
+    assert client.get(f"/ui-api/runs/{run_id}").json()["stdout"] == "1\n"
+
+
+def test_ui_proxy_blocks_admin_calls(client):
+    problem = create_problem(client)
+    assert client.post("/ui-api/problems", json=PROBLEM).status_code == 404
+    assert client.post(f"/ui-api/problems/{problem['id']}/scenarios", json=[]).status_code == 404
+    assert client.get("/ui-api/health").status_code == 404

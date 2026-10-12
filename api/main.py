@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from api import schemas
 from api.auth import client_id
+from api.ui import mount_ui
 from core.db import get_session
 from core.languages import load_languages
 from core.models import Problem, Scenario, Submission
@@ -379,3 +380,7 @@ def list_submissions(
         )
         for s in rows
     ]
+
+
+# Last, so the UI's catch-all static mount never shadows an API route.
+mount_ui(app)

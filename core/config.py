@@ -26,6 +26,8 @@ class Settings:
     redis_url: str = field(default_factory=lambda: os.environ.get("REDIS_URL", "redis://localhost:6379/0"))
     api_keys: dict[str, str] = field(default_factory=lambda: _api_keys(os.environ.get("API_KEYS", "dev:dev-key")))
     queue_name: str = field(default_factory=lambda: os.environ.get("QUEUE_NAME", "codeplay:jobs"))
+    # Key the web UI uses through its proxy; must be one of API_KEYS. Empty disables the UI.
+    ui_api_key: str = field(default_factory=lambda: os.environ.get("UI_API_KEY", ""))
 
 
 settings = Settings()
