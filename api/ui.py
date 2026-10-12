@@ -15,6 +15,7 @@ from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.staticfiles import StaticFiles
 
 from core.config import settings
+from core.ratelimit import hit
 
 UI_DIST = Path(__file__).resolve().parent.parent / "ui" / "dist"
 UUID = r"[0-9a-fA-F-]{36}"
@@ -43,6 +44,17 @@ def mount_ui(app: FastAPI) -> None:
             raise HTTPException(503, detail="the web UI is not configured (set UI_API_KEY)")
         if not is_allowed(request.method, path):
             raise HTTPException(404, detail="not available from the web UI")
+        if request.method == "POST":
+            # Every visitor shares the UI's key, so also limit each visitor.
+            # Behind a reverse proxy, run uvicorn with --proxy-headers so this is the real IP.
+            visitor = request.client.host if request.client else "unknown"
+            retry_after = hit(f"ui:{visitor}", settings.ui_rate_limit_per_minute)
+            if retry_after is not None:
+                raise HTTPException(
+                    429,
+                    detail={"code": "rate_limited", "message": f"too many runs; retry in {retry_after} s"},
+                    headers={"Retry-After": str(retry_after)},
+                )
         async with httpx.AsyncClient(transport=transport, base_url="http://app") as client:
             upstream = await client.request(
                 request.method,

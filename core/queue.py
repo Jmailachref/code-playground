@@ -26,3 +26,7 @@ def dequeue(timeout: int = 5) -> uuid.UUID | None:
 
 def queue_depth() -> int:
     return get_redis().llen(settings.queue_name)
+
+
+def is_queued(submission_id: uuid.UUID) -> bool:
+    return get_redis().lpos(settings.queue_name, str(submission_id)) is not None

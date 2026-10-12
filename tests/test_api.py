@@ -12,7 +12,9 @@ os.environ.setdefault("QUEUE_NAME", "codeplay:test-jobs")
 os.environ.setdefault("API_KEYS", "ui:ui-key,other:other-key")
 os.environ.setdefault("UI_API_KEY", "ui-key")
 
+import dataclasses  # noqa: E402
 import json  # noqa: E402
+from datetime import datetime, timedelta, timezone  # noqa: E402
 from pathlib import Path  # noqa: E402
 
 import pytest  # noqa: E402
@@ -22,7 +24,10 @@ from api.main import app  # noqa: E402
 from core.db import Base, engine  # noqa: E402
 from core.queue import dequeue, get_redis  # noqa: E402
 from core.config import settings  # noqa: E402
-from runner.worker import process  # noqa: E402
+from core.db import SessionLocal  # noqa: E402
+from core.models import Submission  # noqa: E402
+from core.queue import is_queued  # noqa: E402
+from runner.worker import process, recover_lost_jobs  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 PROBLEM = json.loads((ROOT / "examples" / "sum-of-two.json").read_text())
@@ -34,7 +39,8 @@ OTHER = {"Authorization": "Bearer other-key"}
 def fresh_state():
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
-    get_redis().delete(settings.queue_name)
+    redis = get_redis()
+    redis.delete(settings.queue_name, *redis.keys("codeplay:rate:*"))
     yield
 
 
@@ -232,3 +238,58 @@ def test_ui_proxy_blocks_admin_calls(client):
     assert client.post("/ui-api/problems", json=PROBLEM).status_code == 404
     assert client.post(f"/ui-api/problems/{problem['id']}/scenarios", json=[]).status_code == 404
     assert client.get("/ui-api/health").status_code == 404
+
+
+def test_runs_are_rate_limited_per_api_key(client, monkeypatch):
+    monkeypatch.setattr("api.main.settings", dataclasses.replace(settings, rate_limit_per_minute=2))
+    body = {"language": "python", "source_code": "print(1)"}
+    assert [client.post("/v1/runs", json=body, headers=OTHER).status_code for _ in range(3)] == [202, 202, 429]
+    limited = client.post("/v1/runs", json=body, headers=OTHER)
+    assert limited.json()["error"]["code"] == "rate_limited"
+    assert int(limited.headers["Retry-After"]) > 0
+    # Another key has its own budget.
+    other = dataclasses.replace(settings, rate_limit_per_minute=2, api_keys={**settings.api_keys, "third": "third"})
+    monkeypatch.setattr("api.main.settings", other)
+    monkeypatch.setattr("api.auth.settings", other)
+    assert client.post("/v1/runs", json=body, headers={"Authorization": "Bearer third"}).status_code == 202
+
+
+def test_ui_proxy_is_rate_limited_per_visitor(client, monkeypatch):
+    monkeypatch.setattr("api.ui.settings", dataclasses.replace(settings, ui_rate_limit_per_minute=1))
+    body = {"language": "python", "source_code": "print(1)"}
+    assert client.post("/ui-api/runs", json=body).status_code == 202
+    assert client.post("/ui-api/runs", json=body).status_code == 429
+    # Reading results is never limited.
+    assert client.get("/ui-api/problems").status_code == 200
+
+
+def test_lost_jobs_are_requeued(client):
+    long_ago = datetime.now(timezone.utc) - timedelta(minutes=10)
+    with SessionLocal() as session:
+        lost_in_queue = Submission(
+            client_id="ui", language="python", source_code="print(1)", stdin="", status="queued", created_at=long_ago
+        )
+        dead_worker = Submission(
+            client_id="ui", language="python", source_code="print(2)", stdin="", status="running",
+            created_at=long_ago, started_at=long_ago,
+        )
+        fresh = Submission(client_id="ui", language="python", source_code="print(3)", stdin="", status="running",
+                           started_at=datetime.now(timezone.utc))
+        session.add_all([lost_in_queue, dead_worker, fresh])
+        session.commit()
+
+    assert recover_lost_jobs() == 2
+    assert is_queued(lost_in_queue.id) and is_queued(dead_worker.id) and not is_queued(fresh.id)
+    assert recover_lost_jobs() == 0  # already queued: not pushed twice
+
+    work_queue()
+    out = client.get(f"/v1/runs/{dead_worker.id}", headers=AUTH).json()
+    assert (out["status"], out["stdout"]) == ("completed", "2\n")
+
+
+def test_a_job_is_judged_once_even_if_queued_twice(client):
+    run_id = client.post("/v1/runs", json={"language": "python", "source_code": "print(1)"}, headers=AUTH).json()["id"]
+    get_redis().lpush(settings.queue_name, run_id)
+    work_queue()
+    with SessionLocal() as session:
+        assert len(session.get(Submission, run_id).results) == 1

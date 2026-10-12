@@ -17,7 +17,9 @@ from api.ui import mount_ui
 from core.db import get_session
 from core.languages import load_languages
 from core.models import Problem, Scenario, Submission
+from core.config import settings
 from core.queue import enqueue, queue_depth
+from core.ratelimit import hit
 
 app = FastAPI(
     title="Code Playground API",
@@ -54,6 +56,22 @@ async def validation_error(_: Request, exc: RequestValidationError) -> JSONRespo
 
 
 # --- helpers ----------------------------------------------------------------
+
+
+def rate_limit(client: str) -> None:
+    """Limit how many runs and submissions each API key starts per minute.
+
+    The web UI's own key is exempt: its proxy limits each visitor instead.
+    """
+    if settings.ui_api_key and client == settings.api_keys.get(settings.ui_api_key):
+        return
+    retry_after = hit(f"client:{client}", settings.rate_limit_per_minute)
+    if retry_after is not None:
+        raise HTTPException(
+            429,
+            detail={"code": "rate_limited", "message": f"too many runs; retry in {retry_after} s"},
+            headers={"Retry-After": str(retry_after)},
+        )
 
 
 def check_language(language: str, allowed: list[str] | None = None) -> None:
@@ -189,6 +207,7 @@ def create_run(
     body: schemas.RunIn, client: str = Depends(client_id), session: Session = Depends(get_session)
 ) -> schemas.Accepted:
     check_language(body.language)
+    rate_limit(client)
     run = Submission(
         client_id=client,
         user_id=body.user_id,
@@ -326,6 +345,7 @@ def create_submission(
     check_language(body.language, problem.languages)
     if not problem.scenarios:
         raise api_error(400, "no_scenarios", "this problem has no test cases yet")
+    rate_limit(client)
     submission = Submission(
         client_id=client,
         user_id=body.user_id,
