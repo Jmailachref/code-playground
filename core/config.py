@@ -28,6 +28,11 @@ class Settings:
     queue_name: str = field(default_factory=lambda: os.environ.get("QUEUE_NAME", "codeplay:jobs"))
     # Key the web UI uses through its proxy; must be one of API_KEYS. Empty disables the UI.
     ui_api_key: str = field(default_factory=lambda: os.environ.get("UI_API_KEY", ""))
+    # Runs plus submissions allowed per minute, per API key and (for the web UI) per visitor IP.
+    rate_limit_per_minute: int = field(default_factory=lambda: int(os.environ.get("RATE_LIMIT_PER_MINUTE", "60")))
+    ui_rate_limit_per_minute: int = field(
+        default_factory=lambda: int(os.environ.get("UI_RATE_LIMIT_PER_MINUTE", "20"))
+    )
 
 
 settings = Settings()

@@ -117,6 +117,11 @@ class Sandbox:
             stdout, stderr = bytearray(), bytearray()
             for stream, data in frames_iter(sock, tty=False):
                 (stdout if stream == STDOUT else stderr).extend(data)
+            # Close the HTTP response before its socket, or urllib3 later
+            # tries to flush the closed socket and logs an ignored error.
+            response = getattr(sock, "_response", None)
+            if response is not None:
+                response.close()
             raw_sock.close()
             exit_code = api.exec_inspect(exec_id)["ExitCode"]
         except (docker.errors.DockerException, OSError) as exc:

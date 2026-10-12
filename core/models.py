@@ -65,6 +65,7 @@ class Submission(Base):
     compile_output: Mapped[str] = mapped_column(Text, default="")
     error: Mapped[str | None] = mapped_column(Text)  # internal failure detail, never the user's fault
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     results: Mapped[list[ScenarioResult]] = relationship(

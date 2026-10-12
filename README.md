@@ -25,6 +25,34 @@ project; set your own before exposing the stack (the defaults are
 `dev:dev-key,ui:ui-key`). Every request sends `Authorization: Bearer <key>`. Submissions are
 private to the client that created them; problems are shared.
 
+## Configuration
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `API_KEYS` | `dev:dev-key` | Comma-separated `client:key` pairs, one per calling project |
+| `UI_API_KEY` | empty (UI off) | Key the web UI's proxy uses; must be one of `API_KEYS` |
+| `RATE_LIMIT_PER_MINUTE` | 60 | Runs plus submissions per API key per minute (0 = off) |
+| `UI_RATE_LIMIT_PER_MINUTE` | 20 | Runs plus submissions per web UI visitor (IP) per minute |
+| `DATABASE_URL` | local Postgres | SQLAlchemy URL |
+| `REDIS_URL` | `redis://localhost:6379/0` | Queue and rate-limit counters |
+
+Going over a limit returns `429` with a `Retry-After` header. Behind a reverse
+proxy, start uvicorn with `--proxy-headers` so the UI limit sees real visitor
+IPs.
+
+Workers recover lost jobs on their own: every minute they put back on the
+queue any job left `running` for over 5 minutes (its worker died) or `queued`
+but missing from Redis (Redis restarted). Each job is claimed atomically, so
+it is judged once even if it is queued twice.
+
+## Before going public
+
+The sandbox shares the host kernel, so a kernel exploit inside a submission
+could escape the container. Before exposing the API or UI to untrusted users,
+run the worker on its own VM and switch sandbox containers to
+[gVisor](https://gvisor.dev) (`--runtime runsc` on the Docker daemon). The
+worker also holds the Docker socket, which is root on its host.
+
 ## Web UI
 
 - **Playground:** pick a language, write code, give it stdin and run it.
