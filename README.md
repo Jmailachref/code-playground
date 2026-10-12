@@ -8,6 +8,15 @@ browser. This is the engine for a CodinGame-style platform.
 Supported languages: Python 3.13, JavaScript (Node.js 22), Java 21,
 C++20 (GCC 14), Go 1.23.
 
+## Try it in the browser (no Docker needed)
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Jmailachref/code-playground)
+
+The Codespace builds the sandbox images, starts the stack and loads the
+sample questions on its own (the first start takes several minutes). Then
+open the **Ports** tab and click the globe next to port 8000 for the web UI;
+add `/docs` for the API, authorizing with `dev-key`.
+
 ## Run the stack
 
 Needs Docker with Compose.
