@@ -1,0 +1,17 @@
+display_name: "Java 21"
+image: "codeplay/java:21"
+source_file: "Main.java"
+compile: ["javac", "-J-Xshare:auto", "Main.java"]
+run: ["java", "-Xss64m", "-XX:+UseSerialGC", "-cp", ".", "Main"]
+time_multiplier: 2
+extra_memory_mb: 64
+template: |
+  import java.util.Scanner;
+
+  public class Main {
+      public static void main(String[] args) {
+          Scanner in = new Scanner(System.in);
+          String name = in.nextLine();
+          System.out.println("Hello, " + name + "!");
+      }
+  }

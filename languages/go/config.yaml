@@ -1,0 +1,22 @@
+display_name: "Go 1.23"
+image: "codeplay/go:1.23"
+source_file: "main.go"
+prepare: ["cp", "-r", "/opt/gocache", "/tmp/gocache"]
+compile: ["go", "build", "-o", "main", "main.go"]
+run: ["./main"]
+time_multiplier: 1
+extra_memory_mb: 0
+template: |
+  package main
+
+  import (
+  	"bufio"
+  	"fmt"
+  	"os"
+  )
+
+  func main() {
+  	reader := bufio.NewReader(os.Stdin)
+  	name, _ := reader.ReadString('\n')
+  	fmt.Printf("Hello, %s!\n", name[:len(name)-1])
+  }

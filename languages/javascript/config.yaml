@@ -1,0 +1,10 @@
+display_name: "JavaScript (Node.js 22)"
+image: "codeplay/javascript:22"
+source_file: "main.js"
+compile: null
+run: ["node", "main.js"]
+time_multiplier: 1
+extra_memory_mb: 0
+template: |
+  const input = require("fs").readFileSync(0, "utf8").trim();
+  console.log(`Hello, ${input}!`);
