@@ -1,13 +1,60 @@
 # Code Playground
 
 Run code in any supported language inside a locked-down Docker sandbox and
-judge it against test cases (input + expected output). This is the execution
-engine for a CodinGame-style platform; the REST API and web UI come next.
+judge it against test cases (input + expected output), through a REST API
+that other projects can call. This is the engine for a CodinGame-style
+platform; the web UI comes next.
 
 Supported languages: Python 3.13, JavaScript (Node.js 22), Java 21,
 C++20 (GCC 14), Go 1.23.
 
-## Quick start
+## Run the stack
+
+Needs Docker with Compose.
+
+```sh
+sh languages/build.sh                       # sandbox images, once
+API_KEYS=ui:change-me docker compose up -d   # Postgres, Redis, API on :8000, one worker
+open http://localhost:8000/docs              # interactive API docs
+```
+
+`API_KEYS` is a comma-separated list of `client:key` pairs, one per calling
+project. Every request sends `Authorization: Bearer <key>`. Submissions are
+private to the client that created them; problems are shared.
+
+## API
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | /v1/languages | Supported languages and starter templates |
+| POST | /v1/runs | Playground: run code once with custom stdin |
+| GET | /v1/runs/{id} | Run status and output |
+| GET, POST | /v1/problems | List questions, or create one with its test cases |
+| GET, PATCH, DELETE | /v1/problems/{id} | Read (visible test cases only), edit, delete |
+| POST | /v1/problems/{id}/scenarios | Add test cases |
+| PATCH, DELETE | /v1/problems/{id}/scenarios/{sid} | Edit or remove a test case |
+| POST | /v1/submissions | Judge code against every test case; saved with results |
+| GET | /v1/submissions/{id} | Status, verdict, score and per-test-case results |
+| GET | /v1/submissions?user_id=&problem_id= | A user's past submissions, newest first |
+| GET | /v1/health | Liveness and queue depth |
+
+Runs and submissions are asynchronous: `POST` returns `202` with an id, then
+poll `GET` until `status` is `completed` (or `failed` for a platform error).
+Submissions can also pass a `callback_url` that receives a summary when
+judging finishes. Hidden test cases report only a verdict, never their input
+or output.
+
+```sh
+curl -H "Authorization: Bearer change-me" -H "Content-Type: application/json" \
+     -d @examples/sum-of-two.json localhost:8000/v1/problems
+curl -H "Authorization: Bearer change-me" -H "Content-Type: application/json" \
+     -d '{"problem_id": "<id>", "language": "python", "user_id": "alice",
+          "source_code": "a, b = map(int, input().split())\nprint(a + b)"}' \
+     localhost:8000/v1/submissions
+curl -H "Authorization: Bearer change-me" localhost:8000/v1/submissions/<submission id>
+```
+
+## Develop without Compose
 
 Needs Docker and Python 3.11+.
 
@@ -19,6 +66,10 @@ python -m runner.cli run python examples/solutions/sum.py --stdin "1 2"
 python -m runner.cli judge cpp examples/solutions/sum.cpp examples/sum-of-two.json
 python -m pytest                 # end-to-end tests against real containers
 ```
+
+`tests/test_api.py` also needs Postgres and Redis on localhost (for example
+`docker compose up -d postgres redis` with ports published) and a database
+named `codeplay_test`, or set `TEST_DATABASE_URL`.
 
 ## How a submission runs
 
@@ -51,8 +102,10 @@ file name, compile and run commands, then run `sh languages/build.sh`.
 ## Layout
 
 ```text
-core/        shared code: language registry
-runner/      sandbox driver, judge, CLI
+api/         FastAPI app: routes, request/response schemas, API keys
+core/        shared code: settings, database models, queue, language registry
+runner/      sandbox driver, judge, CLI, queue worker
+migrations/  Alembic database migrations
 languages/   one folder per language + the runbox helper
 examples/    sample problem and solutions in every language
 tests/       end-to-end tests
