@@ -2,8 +2,8 @@
 
 Run code in any supported language inside a locked-down Docker sandbox and
 judge it against test cases (input + expected output), through a REST API
-that other projects can call. This is the engine for a CodinGame-style
-platform; the web UI comes next.
+that other projects can call and a web UI for writing and testing code in the
+browser. This is the engine for a CodinGame-style platform.
 
 Supported languages: Python 3.13, JavaScript (Node.js 22), Java 21,
 C++20 (GCC 14), Go 1.23.
@@ -13,14 +13,38 @@ C++20 (GCC 14), Go 1.23.
 Needs Docker with Compose.
 
 ```sh
-sh languages/build.sh                       # sandbox images, once
-API_KEYS=ui:change-me docker compose up -d   # Postgres, Redis, API on :8000, one worker
-open http://localhost:8000/docs              # interactive API docs
+sh languages/build.sh                                    # sandbox images, once
+docker compose up -d                                     # Postgres, Redis, API + UI on :8000, one worker
+docker compose exec api python -m api.seed examples/*.json   # three sample questions
+open http://localhost:8000                               # web UI
+open http://localhost:8000/docs                          # interactive API docs
 ```
 
 `API_KEYS` is a comma-separated list of `client:key` pairs, one per calling
-project. Every request sends `Authorization: Bearer <key>`. Submissions are
+project; set your own before exposing the stack (the defaults are
+`dev:dev-key,ui:ui-key`). Every request sends `Authorization: Bearer <key>`. Submissions are
 private to the client that created them; problems are shared.
+
+## Web UI
+
+- **Playground:** pick a language, write code, give it stdin and run it.
+  Output, errors, time and memory come back in the side panel.
+- **Questions:** read the statement and the visible test cases, run your code
+  against one of them, or submit to judge it against all of them, hidden ones
+  included. Each test case shows pass or fail with your output next to the
+  expected one, and **My submissions** lists past attempts with their code.
+
+The UI asks for a display name and sends it as `user_id`; there are no
+accounts yet. It talks to the API through `/ui-api/...`, a proxy in the API
+service that adds `UI_API_KEY` on the server, so no key reaches the browser.
+The proxy only allows what the UI needs (languages, runs, reading questions,
+submissions); creating or editing questions still requires a real API key.
+
+To work on the UI with hot reload, run the API on :8000 and then:
+
+```sh
+cd ui && npm install && npm run dev    # http://localhost:5173, proxies /ui-api to :8000
+```
 
 ## API
 
@@ -102,7 +126,8 @@ file name, compile and run commands, then run `sh languages/build.sh`.
 ## Layout
 
 ```text
-api/         FastAPI app: routes, request/response schemas, API keys
+api/         FastAPI app: routes, schemas, API keys, UI proxy, seed script
+ui/          React + TypeScript + Monaco web UI (Vite)
 core/        shared code: settings, database models, queue, language registry
 runner/      sandbox driver, judge, CLI, queue worker
 migrations/  Alembic database migrations

@@ -1,11 +1,12 @@
-# Local stack: Postgres, Redis, the API on :8000 and one runner worker.
+# Local stack: Postgres, Redis, the API and web UI on :8000, one runner worker.
 # Build the language images first: sh languages/build.sh
 x-app: &app
   build: .
   environment:
     DATABASE_URL: postgresql+psycopg://codeplay:codeplay@postgres:5432/codeplay
     REDIS_URL: redis://redis:6379/0
-    API_KEYS: ${API_KEYS:-dev:dev-key}
+    API_KEYS: ${API_KEYS:-dev:dev-key,ui:ui-key}
+    UI_API_KEY: ${UI_API_KEY:-ui-key}
   depends_on:
     postgres:
       condition: service_healthy
