@@ -1,0 +1,29 @@
+{
+  "slug": "sum-of-two",
+  "title": "Sum of two",
+  "language": "python",
+  "level": 1,
+  "statement": "Read two integers on one line and print their sum.",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 256,
+  "comparator": "trim",
+  "starter_code": "a, b = map(int, input().split())\n# Print the sum of a and b\n",
+  "scenarios": [
+    {
+      "name": "Simple",
+      "input": "1 2\n",
+      "expected_output": "3\n"
+    },
+    {
+      "name": "Negatives",
+      "input": "-5 3\n",
+      "expected_output": "-2\n"
+    },
+    {
+      "name": "Large",
+      "input": "1000000000 1000000000\n",
+      "expected_output": "2000000000\n",
+      "hidden": true
+    }
+  ]
+}

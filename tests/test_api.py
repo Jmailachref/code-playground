@@ -30,7 +30,7 @@ from core.queue import is_queued  # noqa: E402
 from runner.worker import process, recover_lost_jobs  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-PROBLEM = json.loads((ROOT / "examples" / "sum-of-two.json").read_text())
+PROBLEM = json.loads((ROOT / "examples" / "python" / "sum-of-two.json").read_text())
 AUTH = {"Authorization": "Bearer ui-key"}
 OTHER = {"Authorization": "Bearer other-key"}
 
@@ -55,8 +55,8 @@ def work_queue():
         process(job)
 
 
-def create_problem(client):
-    response = client.post("/v1/problems", json=PROBLEM, headers=AUTH)
+def create_problem(client, **overrides):
+    response = client.post("/v1/problems", json={**PROBLEM, **overrides}, headers=AUTH)
     assert response.status_code == 201, response.text
     return response.json()
 
@@ -108,7 +108,40 @@ def test_problem_hides_hidden_scenarios(client):
     fetched = client.get(f"/v1/problems/{problem['id']}", headers=AUTH).json()
     assert "1000000000" not in json.dumps(fetched)
     listed = client.get("/v1/problems", headers=AUTH).json()
-    assert listed == [{"id": problem["id"], "slug": "sum-of-two", "title": "Sum of two"}]
+    assert listed == [
+        {"id": problem["id"], "slug": "sum-of-two", "title": "Sum of two", "language": "python", "level": 1}
+    ]
+
+
+def test_questions_have_a_language_and_level(client):
+    create_problem(client)
+    create_problem(client, slug="sum-cpp", language="cpp", level=2, starter_code=None)
+    create_problem(client, slug="sum-hard", level=3)
+    listed = client.get("/v1/problems", headers=AUTH).json()
+    assert [(p["slug"], p["language"], p["level"]) for p in listed] == [
+        ("sum-cpp", "cpp", 2), ("sum-of-two", "python", 1), ("sum-hard", "python", 3)
+    ]
+    python = client.get("/v1/problems", params={"language": "python"}, headers=AUTH).json()
+    assert [p["slug"] for p in python] == ["sum-of-two", "sum-hard"]
+    hard = client.get("/v1/problems", params={"language": "python", "level": 3}, headers=AUTH).json()
+    assert [p["slug"] for p in hard] == ["sum-hard"]
+
+    cpp = next(p for p in listed if p["slug"] == "sum-cpp")
+    fetched = client.get(f"/v1/problems/{cpp['id']}", headers=AUTH).json()
+    assert "int main()" in fetched["starter_code"]  # no starter code: the language template
+    own = client.get(f"/v1/problems/{listed[1]['id']}", headers=AUTH).json()
+    assert own["starter_code"] == PROBLEM["starter_code"]
+
+
+def test_question_language_and_level_are_validated(client):
+    assert client.post(
+        "/v1/problems", json={**PROBLEM, "language": "cobol"}, headers=AUTH
+    ).json()["error"]["code"] == "unsupported_language"
+    too_hard = client.post("/v1/problems", json={**PROBLEM, "level": 5}, headers=AUTH)
+    assert too_hard.status_code == 400 and too_hard.json()["error"]["code"] == "invalid_request"
+    no_language = {k: v for k, v in PROBLEM.items() if k != "language"}
+    assert client.post("/v1/problems", json=no_language, headers=AUTH).status_code == 400
+    assert client.get("/v1/problems", params={"level": 0}, headers=AUTH).status_code == 400
 
 
 def test_duplicate_slug_is_rejected(client):
@@ -136,7 +169,7 @@ def test_edit_scenarios(client):
 
 
 def test_submission_is_judged_and_saved(client):
-    problem = create_problem(client)
+    problem = create_problem(client, language="cpp")
     code = (ROOT / "examples" / "solutions" / "sum.cpp").read_text()
     response = client.post(
         "/v1/submissions",
@@ -211,9 +244,8 @@ def test_validation_errors(client):
     assert missing.json()["error"]["code"] == "problem_not_found"
 
 
-def test_restricted_languages(client):
+def test_submissions_must_use_the_question_language(client):
     problem = create_problem(client)
-    client.patch(f"/v1/problems/{problem['id']}", json={"languages": ["python"]}, headers=AUTH)
     response = client.post(
         "/v1/submissions",
         json={"problem_id": problem["id"], "language": "go", "source_code": "package main"},

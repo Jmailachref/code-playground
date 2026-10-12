@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 
@@ -12,6 +12,7 @@ MAX_STDIN_BYTES = 1024 * 1024
 MAX_IO_BYTES = 8 * 1024 * 1024
 
 Comparator = Literal["exact", "trim", "tokens", "float"]
+Level = Annotated[int, Field(ge=1, le=4, description="Difficulty: 1 beginner, 2 intermediate, 3 advanced, 4 expert")]
 
 
 class LanguageOut(BaseModel):
@@ -58,7 +59,11 @@ class ProblemIn(BaseModel):
     time_limit_ms: int = Field(default=2000, ge=100, le=10_000)
     memory_limit_mb: int = Field(default=256, ge=32, le=1024)
     comparator: Comparator = "trim"
-    languages: list[str] = Field(default_factory=list, description="Allowed languages; empty means all")
+    language: str = Field(description="The language this question is solved in, e.g. python")
+    level: Level = 1
+    starter_code: str | None = Field(
+        default=None, max_length=MAX_SOURCE_BYTES, description="Pre-filled editor code; null uses the language template"
+    )
     scenarios: list[ScenarioIn] = Field(default_factory=list)
 
 
@@ -68,7 +73,9 @@ class ProblemUpdate(BaseModel):
     time_limit_ms: int | None = Field(default=None, ge=100, le=10_000)
     memory_limit_mb: int | None = Field(default=None, ge=32, le=1024)
     comparator: Comparator | None = None
-    languages: list[str] | None = None
+    language: str | None = None
+    level: Level | None = None
+    starter_code: str | None = Field(default=None, max_length=MAX_SOURCE_BYTES)
 
 
 class ProblemSummary(BaseModel):
@@ -77,6 +84,8 @@ class ProblemSummary(BaseModel):
     id: uuid.UUID
     slug: str
     title: str
+    language: str
+    level: int
 
 
 class ProblemOut(ProblemSummary):
@@ -84,7 +93,7 @@ class ProblemOut(ProblemSummary):
     time_limit_ms: int
     memory_limit_mb: int
     comparator: str
-    languages: list[str]
+    starter_code: str = Field(description="Code to pre-fill the editor with")
     scenarios: list[ScenarioOut]
     hidden_scenarios: int = Field(description="How many hidden test cases exist (not returned)")
 

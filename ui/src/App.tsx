@@ -53,7 +53,7 @@ export function App() {
         {!error && !languages && <p className="muted page">Loading…</p>}
         {languages && !userId && <NamePrompt onDone={(name) => (save("user_id", name), setUserId(name))} />}
         {languages && userId && section === "playground" && <Playground languages={languages} userId={userId} />}
-        {languages && userId && section === "problems" && !problemMatch && <ProblemList />}
+        {languages && userId && section === "problems" && !problemMatch && <ProblemList languages={languages} />}
         {languages && userId && problemMatch && (
           <ProblemPage key={problemMatch[1]} problemId={problemMatch[1]} languages={languages} userId={userId} />
         )}

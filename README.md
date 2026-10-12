@@ -24,7 +24,7 @@ Needs Docker with Compose.
 ```sh
 sh languages/build.sh                                    # sandbox images, once
 docker compose up -d                                     # Postgres, Redis, API + UI on :8000, one worker
-docker compose exec api python -m api.seed examples/*.json   # three sample questions
+docker compose exec api python -m api.seed examples/*/*.json  # 11 sample questions
 open http://localhost:8000                               # web UI
 open http://localhost:8000/docs                          # interactive API docs
 ```
@@ -90,7 +90,7 @@ cd ui && npm install && npm run dev    # http://localhost:5173, proxies /ui-api 
 | GET | /v1/languages | Supported languages and starter templates |
 | POST | /v1/runs | Playground: run code once with custom stdin |
 | GET | /v1/runs/{id} | Run status and output |
-| GET, POST | /v1/problems | List questions, or create one with its test cases |
+| GET, POST | /v1/problems | List questions (filter with `?language=| GET, POST | /v1/problems | List questions, or create one with its test cases |level=`), or create one with its test cases |
 | GET, PATCH, DELETE | /v1/problems/{id} | Read (visible test cases only), edit, delete |
 | POST | /v1/problems/{id}/scenarios | Add test cases |
 | PATCH, DELETE | /v1/problems/{id}/scenarios/{sid} | Edit or remove a test case |
@@ -107,13 +107,46 @@ or output.
 
 ```sh
 curl -H "Authorization: Bearer change-me" -H "Content-Type: application/json" \
-     -d @examples/sum-of-two.json localhost:8000/v1/problems
+     -d @examples/python/sum-of-two.json localhost:8000/v1/problems
 curl -H "Authorization: Bearer change-me" -H "Content-Type: application/json" \
      -d '{"problem_id": "<id>", "language": "python", "user_id": "alice",
           "source_code": "a, b = map(int, input().split())\nprint(a + b)"}' \
      localhost:8000/v1/submissions
 curl -H "Authorization: Bearer change-me" localhost:8000/v1/submissions/<submission id>
 ```
+
+## Questions
+
+Each question belongs to one language and has a difficulty level from 1 to 4
+(1 Beginner, 2 Intermediate, 3 Advanced, 4 Expert). Submissions must use the
+question's language. A question can also carry `starter_code` to pre-fill the
+editor; without it the editor starts from the language's template.
+
+Sample questions live in `examples/<language>/<slug>.json`:
+
+```json
+{
+  "slug": "sum-of-two",
+  "title": "Sum of two",
+  "language": "python",
+  "level": 1,
+  "statement": "Read two integers on one line and print their sum.",
+  "starter_code": "a, b = map(int, input().split())\n# Print the sum of a and b\n",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 256,
+  "comparator": "trim",
+  "scenarios": [
+    { "name": "Simple", "input": "1 2\n", "expected_output": "3\n" },
+    { "name": "Large", "input": "1000000000 1000000000\n", "expected_output": "2000000000\n", "hidden": true }
+  ]
+}
+```
+
+Add one by dropping a file there and running the seed script (it skips slugs
+that already exist; rebuild the `api` image first so the file is inside it), or
+by sending the same JSON to `POST /v1/problems`. `GET /v1/problems` takes
+`?language=python&level=2` to filter. A reference solution for every sample is
+in `examples/solutions/<language>/`.
 
 ## Develop without Compose
 
@@ -124,7 +157,7 @@ pip install -r requirements.txt
 sh languages/build.sh            # builds the sandbox helper and one image per language
 python -m runner.cli languages
 python -m runner.cli run python examples/solutions/sum.py --stdin "1 2"
-python -m runner.cli judge cpp examples/solutions/sum.cpp examples/sum-of-two.json
+python -m runner.cli judge python examples/solutions/python/sum-of-two.py examples/python/sum-of-two.json
 python -m pytest                 # end-to-end tests against real containers
 ```
 
@@ -169,6 +202,6 @@ core/        shared code: settings, database models, queue, language registry
 runner/      sandbox driver, judge, CLI, queue worker
 migrations/  Alembic database migrations
 languages/   one folder per language + the runbox helper
-examples/    sample problem and solutions in every language
+examples/    sample questions per language (examples/<language>/) and their solutions
 tests/       end-to-end tests
 ```

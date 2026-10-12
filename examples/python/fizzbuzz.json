@@ -1,0 +1,35 @@
+{
+  "slug": "fizzbuzz",
+  "title": "FizzBuzz",
+  "language": "python",
+  "level": 1,
+  "statement": "Read an integer n (1 <= n <= 100000). For each i from 1 to n print one line: \"FizzBuzz\" if i is divisible by 15, \"Fizz\" if divisible by 3, \"Buzz\" if divisible by 5, otherwise i.",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 256,
+  "comparator": "trim",
+  "starter_code": "n = int(input())\nfor i in range(1, n + 1):\n    # Print Fizz, Buzz, FizzBuzz or i\n    pass\n",
+  "scenarios": [
+    {
+      "name": "n = 5",
+      "input": "5\n",
+      "expected_output": "1\n2\nFizz\n4\nBuzz\n"
+    },
+    {
+      "name": "n = 15",
+      "input": "15\n",
+      "expected_output": "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz\n"
+    },
+    {
+      "name": "n = 1",
+      "input": "1\n",
+      "expected_output": "1\n",
+      "hidden": true
+    },
+    {
+      "name": "n = 30",
+      "input": "30\n",
+      "expected_output": "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz\n16\n17\nFizz\n19\nBuzz\nFizz\n22\n23\nFizz\nBuzz\n26\nFizz\n28\n29\nFizzBuzz\n",
+      "hidden": true
+    }
+  ]
+}

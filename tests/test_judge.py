@@ -11,7 +11,7 @@ from core.languages import get_language
 from runner.judge import Comparator, Limits, Scenario, Verdict, judge, outputs_match
 
 ROOT = Path(__file__).resolve().parent.parent
-PROBLEM = json.loads((ROOT / "examples" / "sum-of-two.json").read_text())
+PROBLEM = json.loads((ROOT / "examples" / "python" / "sum-of-two.json").read_text())
 SCENARIOS = [
     Scenario(s["name"], s["input"], s["expected_output"], s.get("hidden", False)) for s in PROBLEM["scenarios"]
 ]
@@ -85,6 +85,24 @@ def test_sleeping_program_hits_the_wall_clock():
 def test_memory_bomb_is_memory_limit_exceeded(language, code):
     result = run(language, code, memory_limit_mb=128, time_limit_ms=5000)
     assert result.verdict is Verdict.MEMORY_LIMIT_EXCEEDED, result.results[0]
+
+
+def test_heavy_compile_fits_a_small_memory_limit():
+    # g++ needs ~250 MB for <bits/stdc++.h>; the program itself still gets only 128 MB.
+    ok = run("cpp", "#include <bits/stdc++.h>\nint main(){ std::cout << 1; }", memory_limit_mb=128)
+    assert ok.verdict is Verdict.ACCEPTED, ok
+    code = "#include <bits/stdc++.h>\nint main(){ std::vector<char> v(512u << 20, 1); std::cout << (int)v[7]; }"
+    bomb = run("cpp", code, memory_limit_mb=128, time_limit_ms=5000)
+    assert bomb.verdict is Verdict.MEMORY_LIMIT_EXCEEDED, bomb.results[0]
+
+
+def test_long_output_is_compared_in_full():
+    expected = "".join(f"{i}\n" for i in range(50_000))  # ~290 KB, more than is stored
+    result = judge(
+        get_language("python"), "for i in range(50_000): print(i)", [Scenario("long", "", expected)]
+    )
+    assert result.verdict is Verdict.ACCEPTED, result.results[0].verdict
+    assert len(result.results[0].stdout) == 64 * 1024
 
 
 def test_output_flood_is_output_limit_exceeded():

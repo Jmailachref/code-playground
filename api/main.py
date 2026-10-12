@@ -74,12 +74,17 @@ def rate_limit(client: str) -> None:
         )
 
 
-def check_language(language: str, allowed: list[str] | None = None) -> None:
+def check_language(language: str, allowed: str | None = None) -> None:
     if language not in load_languages():
         supported = ", ".join(load_languages())
         raise api_error(400, "unsupported_language", f"'{language}' is not supported; use one of: {supported}")
-    if allowed and language not in allowed:
-        raise api_error(400, "language_not_allowed", f"this problem accepts: {', '.join(allowed)}")
+    if allowed is not None and language != allowed:
+        raise api_error(400, "language_not_allowed", f"this problem is solved in {allowed}")
+
+
+def language_template(language: str) -> str:
+    lang = load_languages().get(language)
+    return lang.template if lang else ""
 
 
 def get_problem(session: Session, problem_id: uuid.UUID) -> Problem:
@@ -107,7 +112,9 @@ def problem_out(problem: Problem) -> schemas.ProblemOut:
         time_limit_ms=problem.time_limit_ms,
         memory_limit_mb=problem.memory_limit_mb,
         comparator=problem.comparator,
-        languages=problem.languages,
+        language=problem.language,
+        level=problem.level,
+        starter_code=problem.starter_code if problem.starter_code is not None else language_template(problem.language),
         scenarios=[schemas.ScenarioOut.model_validate(s) for s in visible],
         hidden_scenarios=len(problem.scenarios) - len(visible),
     )
@@ -233,16 +240,26 @@ def read_run(
 
 
 @app.get("/v1/problems", response_model=list[schemas.ProblemSummary], tags=["problems"])
-def list_problems(_: str = Depends(client_id), session: Session = Depends(get_session)) -> list[Problem]:
-    return list(session.scalars(select(Problem).order_by(Problem.created_at)))
+def list_problems(
+    language: str | None = None,
+    level: int | None = Query(default=None, ge=1, le=4),
+    _: str = Depends(client_id),
+    session: Session = Depends(get_session),
+) -> list[Problem]:
+    """List questions, easiest first, optionally for one language and/or level."""
+    query = select(Problem).order_by(Problem.language, Problem.level, Problem.created_at)
+    if language is not None:
+        query = query.where(Problem.language == language)
+    if level is not None:
+        query = query.where(Problem.level == level)
+    return list(session.scalars(query))
 
 
 @app.post("/v1/problems", status_code=201, response_model=schemas.ProblemOut, tags=["problems"])
 def create_problem(
     body: schemas.ProblemIn, _: str = Depends(client_id), session: Session = Depends(get_session)
 ) -> schemas.ProblemOut:
-    for language in body.languages:
-        check_language(language)
+    check_language(body.language)
     problem = Problem(**body.model_dump(exclude={"scenarios"}))
     problem.scenarios = [Scenario(order=i, **s.model_dump()) for i, s in enumerate(body.scenarios)]
     session.add(problem)
@@ -268,8 +285,8 @@ def update_problem(
     session: Session = Depends(get_session),
 ) -> schemas.ProblemOut:
     problem = get_problem(session, problem_id)
-    for language in body.languages or []:
-        check_language(language)
+    if body.language is not None:
+        check_language(body.language)
     for field, value in body.model_dump(exclude_unset=True).items():
         setattr(problem, field, value)
     session.commit()
@@ -342,7 +359,7 @@ def create_submission(
     body: schemas.SubmissionIn, client: str = Depends(client_id), session: Session = Depends(get_session)
 ) -> schemas.Accepted:
     problem = get_problem(session, body.problem_id)
-    check_language(body.language, problem.languages)
+    check_language(body.language, problem.language)
     if not problem.scenarios:
         raise api_error(400, "no_scenarios", "this problem has no test cases yet")
     rate_limit(client)

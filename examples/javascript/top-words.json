@@ -1,0 +1,35 @@
+{
+  "slug": "top-words",
+  "title": "Top three words",
+  "language": "javascript",
+  "level": 2,
+  "statement": "Read a text (one or more lines). Words are separated by whitespace and compared case-insensitively. Print the three most frequent words in lowercase, one per line as \"word count\". Break ties alphabetically. If there are fewer than three distinct words, print them all.",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 256,
+  "comparator": "trim",
+  "starter_code": "const data = require(\"fs\").readFileSync(0, \"utf8\");\n// Write your solution here\n",
+  "scenarios": [
+    {
+      "name": "Example",
+      "input": "the cat and the hat and the bat\n",
+      "expected_output": "the 3\nand 2\nbat 1\n"
+    },
+    {
+      "name": "Case",
+      "input": "Go go GO stop Stop wait\n",
+      "expected_output": "go 3\nstop 2\nwait 1\n"
+    },
+    {
+      "name": "Two words",
+      "input": "yes no\n",
+      "expected_output": "no 1\nyes 1\n",
+      "hidden": true
+    },
+    {
+      "name": "Ties",
+      "input": "b a c b a c d\n",
+      "expected_output": "a 2\nb 2\nc 2\n",
+      "hidden": true
+    }
+  ]
+}

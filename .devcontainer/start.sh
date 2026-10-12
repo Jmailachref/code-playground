@@ -8,6 +8,6 @@ docker compose up -d --build
 until docker compose exec -T api python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/v1/health')" 2>/dev/null; do
   sleep 2
 done
-docker compose exec -T api sh -c 'python -m api.seed examples/*.json'
+docker compose exec -T api sh -c 'python -m api.seed examples/*/*.json'
 echo
 echo "Code Playground is running: open the Ports tab and click the globe next to port 8000."

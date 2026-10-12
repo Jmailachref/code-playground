@@ -102,8 +102,20 @@ textarea.io { resize: vertical; }
 .history th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--border); }
 .history td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
 
-.problem-list { list-style: none; padding: 0; margin: 16px 0; }
-.problem-list a { display: flex; justify-content: space-between; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; color: var(--text); }
+.badge-level-1 { background: var(--pass-bg); color: var(--pass); }
+.badge-level-2 { background: var(--code-bg); color: var(--accent); }
+.badge-level-3 { background: var(--error-bg); color: var(--error); }
+.badge-level-4 { background: var(--fail-bg); color: var(--fail); }
+.meta { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 0; }
+.toolbar-language { font-weight: 600; }
+.filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin: 12px 0 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 999px; padding: 5px 12px; font: inherit; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+.chip-count { font-size: 12px; opacity: 0.75; font-variant-numeric: tabular-nums; }
+.group-title { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 20px 0 0; }
+.problem-list { list-style: none; padding: 0; margin: 8px 0 16px; }
+.problem-list a { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; color: var(--text); }
 .problem-list a:hover { border-color: var(--accent); }
 .problem-title { font-weight: 600; }
 

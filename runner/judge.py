@@ -156,16 +156,18 @@ def judge(
                 if proc.timed_out:
                     compile_output += "\nCompilation timed out."
                 return JudgeResult(Verdict.COMPILATION_ERROR, compile_output)
+            box.restrict_memory()
 
         results = []
         for scenario in scenarios:
             proc = box.execute(
                 language.run, scenario.input.encode(), cpu_ms, wall_ms, OUTPUT_LIMIT_BYTES, OUTPUT_LIMIT_BYTES
             )
-            stdout = _text(proc.stdout)
             verdict = classify(proc, cpu_ms, box.memory_mb)
             if verdict is None:
-                if scenario.expected_output is None or outputs_match(stdout, scenario.expected_output, comparator):
+                # Compare the whole output; only the first STORED_OUTPUT_BYTES are kept.
+                full_stdout = proc.stdout.decode("utf-8", errors="replace")
+                if scenario.expected_output is None or outputs_match(full_stdout, scenario.expected_output, comparator):
                     verdict = Verdict.ACCEPTED
                 else:
                     verdict = Verdict.WRONG_ANSWER
@@ -173,7 +175,7 @@ def judge(
                 ScenarioResult(
                     scenario=scenario.name,
                     verdict=verdict,
-                    stdout=stdout,
+                    stdout=_text(proc.stdout),
                     stderr=_text(proc.stderr),
                     exit_code=proc.exit_code,
                     time_ms=proc.cpu_ms,
