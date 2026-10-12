@@ -1,0 +1,58 @@
+# Local stack: Postgres, Redis, the API on :8000 and one runner worker.
+# Build the language images first: sh languages/build.sh
+x-app: &app
+  build: .
+  environment:
+    DATABASE_URL: postgresql+psycopg://codeplay:codeplay@postgres:5432/codeplay
+    REDIS_URL: redis://redis:6379/0
+    API_KEYS: ${API_KEYS:-dev:dev-key}
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_started
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: codeplay
+      POSTGRES_PASSWORD: codeplay
+      POSTGRES_DB: codeplay
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "codeplay"]
+      interval: 2s
+      retries: 30
+
+  redis:
+    image: redis:7
+
+  migrate:
+    <<: *app
+    command: ["alembic", "upgrade", "head"]
+
+  api:
+    <<: *app
+    ports:
+      - "8000:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  worker:
+    <<: *app
+    command: ["python", "-m", "runner.worker"]
+    # The worker starts sandbox containers through the host's Docker daemon.
+    # This is root-equivalent access: run workers on a dedicated host.
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    deploy:
+      replicas: 1
+
+volumes:
+  pgdata:
