@@ -31,6 +31,20 @@ ALLOWED = [
 ]
 
 
+class UIFiles(StaticFiles):
+    """Serves the built UI. index.html must be revalidated on every load, or a
+    browser keeps running an old build against a newer API after an update;
+    the hashed files under assets/ never change, so they can be cached."""
+
+    def file_response(self, full_path, *args, **kwargs):
+        response = super().file_response(full_path, *args, **kwargs)
+        if str(full_path).endswith(".html"):
+            response.headers["Cache-Control"] = "no-cache"
+        elif "/assets/" in str(full_path):
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        return response
+
+
 def is_allowed(method: str, path: str) -> bool:
     return any(method == m and re.fullmatch(p, path) for m, p in ALLOWED)
 
@@ -73,4 +87,4 @@ def mount_ui(app: FastAPI) -> None:
         )
 
     if UI_DIST.is_dir():
-        app.mount("/", StaticFiles(directory=UI_DIST, html=True), name="ui")
+        app.mount("/", UIFiles(directory=UI_DIST, html=True), name="ui")
