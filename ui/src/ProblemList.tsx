@@ -3,7 +3,7 @@ import { api, levelLabel, type Language, type Level, type ProblemSummary } from 
 import { LevelBadge } from "./LevelBadge";
 import { load, save } from "./storage";
 
-const LEVELS: Level[] = [1, 2, 3, 4];
+const LEVELS: Level[] = [1, 2, 3, 4, 5];
 
 export function ProblemList({ languages }: { languages: Language[] }) {
   const [problems, setProblems] = useState<ProblemSummary[] | null>(null);

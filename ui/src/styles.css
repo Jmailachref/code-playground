@@ -106,6 +106,7 @@ textarea.io { resize: vertical; }
 .badge-level-2 { background: var(--code-bg); color: var(--accent); }
 .badge-level-3 { background: var(--error-bg); color: var(--error); }
 .badge-level-4 { background: var(--fail-bg); color: var(--fail); }
+.badge-level-5 { background: var(--fail); color: var(--fail-bg); }
 .meta { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 0; }
 .toolbar-language { font-weight: 600; }
 .filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin: 12px 0 4px; }

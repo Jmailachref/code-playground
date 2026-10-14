@@ -19,7 +19,7 @@ export interface Language {
   template: string;
 }
 
-export type Level = 1 | 2 | 3 | 4;
+export type Level = 1 | 2 | 3 | 4 | 5;
 
 export interface ProblemSummary {
   id: string;
@@ -118,7 +118,8 @@ async function waitFor<T extends { status: Status }>(path: string): Promise<T> {
 
 export const api = {
   languages: () => call<Language[]>("GET", "languages"),
-  problems: () => call<ProblemSummary[]>("GET", "problems"),
+  // The playground lists approved code questions only; QCMs are answered in RecruteHub tests.
+  problems: () => call<ProblemSummary[]>("GET", "problems?kind=code&status=approved"),
   problem: (id: string) => call<Problem>("GET", `problems/${id}`),
 
   async run(language: string, source_code: string, stdin: string, user_id: string): Promise<Run> {
@@ -144,6 +145,7 @@ export const levelLabel: Record<Level, string> = {
   2: "Intermediate",
   3: "Advanced",
   4: "Expert",
+  5: "Master",
 };
 
 export const verdictLabel: Record<Verdict, string> = {

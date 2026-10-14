@@ -109,7 +109,10 @@ def test_problem_hides_hidden_scenarios(client):
     assert "1000000000" not in json.dumps(fetched)
     listed = client.get("/v1/problems", headers=AUTH).json()
     assert listed == [
-        {"id": problem["id"], "slug": "sum-of-two", "title": "Sum of two", "language": "python", "level": 1}
+        {
+            "id": problem["id"], "slug": "sum-of-two", "title": "Sum of two", "kind": "code",
+            "language": "python", "level": 1, "status": "approved",
+        }
     ]
 
 
@@ -137,7 +140,7 @@ def test_question_language_and_level_are_validated(client):
     assert client.post(
         "/v1/problems", json={**PROBLEM, "language": "cobol"}, headers=AUTH
     ).json()["error"]["code"] == "unsupported_language"
-    too_hard = client.post("/v1/problems", json={**PROBLEM, "level": 5}, headers=AUTH)
+    too_hard = client.post("/v1/problems", json={**PROBLEM, "level": 6}, headers=AUTH)
     assert too_hard.status_code == 400 and too_hard.json()["error"]["code"] == "invalid_request"
     no_language = {k: v for k, v in PROBLEM.items() if k != "language"}
     assert client.post("/v1/problems", json=no_language, headers=AUTH).status_code == 400
@@ -340,3 +343,156 @@ def test_a_job_is_judged_once_even_if_queued_twice(client):
     work_queue()
     with SessionLocal() as session:
         assert len(session.get(Submission, run_id).results) == 1
+
+
+# --- QCM questions and tests --------------------------------------------------
+
+
+def qcm(slug, language="docker", level=2, **overrides):
+    return {
+        "slug": slug,
+        "title": f"Question {slug}",
+        "statement": "Which command lists running containers?",
+        "kind": "qcm",
+        "language": language,
+        "level": level,
+        "choices": ["docker ps", "docker ls", "docker images"],
+        "correct_choices": [0],
+        **overrides,
+    }
+
+
+def add(client, body):
+    response = client.post("/v1/problems", json=body, headers=AUTH)
+    assert response.status_code == 201, response.text
+    return response.json()
+
+
+def test_qcm_question_hides_its_answer(client):
+    question = add(client, qcm("ps", correct_choices=[0, 2]))
+    assert question["choices"] == ["docker ps", "docker ls", "docker images"]
+    assert question["multiple"] is True and question["starter_code"] is None
+    assert "correct_choices" not in client.get(f"/v1/problems/{question['id']}", headers=AUTH).json()
+    full = client.get(f"/v1/problems/{question['id']}/full", headers=AUTH).json()
+    assert full["correct_choices"] == [0, 2]
+
+
+def test_full_view_shows_hidden_scenarios_but_not_through_the_web_ui(client):
+    problem = create_problem(client)
+    full = client.get(f"/v1/problems/{problem['id']}/full", headers=AUTH).json()
+    assert len(full["scenarios"]) == 3 and any(s["hidden"] for s in full["scenarios"])
+    assert client.get(f"/ui-api/problems/{problem['id']}/full").status_code == 404
+
+
+@pytest.mark.parametrize(
+    "body, message",
+    [
+        (qcm("a", choices=None), "needs choices"),
+        (qcm("b", correct_choices=[3]), "indexes"),
+        (qcm("c", correct_choices=[0, 0]), "distinct"),
+        (qcm("d", scenarios=[{"name": "x", "expected_output": "y"}]), "no scenarios"),
+        ({**PROBLEM, "slug": "e", "choices": ["a", "b"]}, "only qcm"),
+    ],
+)
+def test_qcm_fields_are_validated(client, body, message):
+    response = client.post("/v1/problems", json=body, headers=AUTH)
+    assert response.status_code == 400
+    assert message in json.dumps(response.json())
+
+
+def test_qcm_topic_need_not_be_a_language_but_code_must(client):
+    add(client, qcm("k8s", language="kubernetes"))
+    assert client.post(
+        "/v1/problems", json={**PROBLEM, "language": "docker"}, headers=AUTH
+    ).json()["error"]["code"] == "unsupported_language"
+    question = add(client, qcm("fix-me"))
+    bad = client.patch(f"/v1/problems/{question['id']}", json={"correct_choices": [9]}, headers=AUTH)
+    assert bad.status_code == 400 and bad.json()["error"]["code"] == "invalid_question"
+
+
+def test_qcm_takes_no_submissions_or_scenarios(client):
+    question = add(client, qcm("ps"))
+    sub = client.post(
+        "/v1/submissions",
+        json={"problem_id": question["id"], "language": "python", "source_code": "print(1)"},
+        headers=AUTH,
+    )
+    assert sub.json()["error"]["code"] == "not_code"
+    scen = client.post(
+        f"/v1/problems/{question['id']}/scenarios", json=[{"name": "x", "expected_output": "y"}], headers=AUTH
+    )
+    assert scen.status_code == 400
+
+
+def test_stock_counts_approved_questions_by_kind(client):
+    create_problem(client)
+    create_problem(client, slug="sum-2")
+    add(client, qcm("py-qcm", language="python", level=1))
+    add(client, qcm("pending", language="python", level=1, status="pending"))
+    add(client, qcm("ps"))
+    stock = client.get("/v1/stock", headers=AUTH).json()
+    assert stock == [
+        {"language": "docker", "level": 2, "code": 0, "qcm": 1},
+        {"language": "python", "level": 1, "code": 2, "qcm": 1},
+    ]
+    assert len(client.get("/v1/stock", params={"language": "python"}, headers=AUTH).json()) == 1
+
+
+def test_test_draws_the_recipe_and_hides_answers(client):
+    for i in range(3):
+        create_problem(client, slug=f"sum-{i}")
+    for i in range(4):
+        add(client, qcm(f"docker-{i}"))
+    add(client, qcm("never", status="rejected"))
+    recipe = [{"language": "python", "level": 1, "code": 2}, {"language": "docker", "level": 2, "qcm": 3}]
+    response = client.post("/v1/tests", json={"recipe": recipe, "external_ref": "session-1"}, headers=AUTH)
+    assert response.status_code == 201, response.text
+    test = response.json()
+    kinds = [(q["kind"], q["language"]) for q in test["questions"]]
+    assert kinds == [("code", "python")] * 2 + [("qcm", "docker")] * 3
+    assert len({q["id"] for q in test["questions"]}) == 5
+    assert "never" not in [q["slug"] for q in test["questions"]]
+    text = json.dumps(test)
+    assert "correct_choices" not in text and "1000000000" not in text
+    # Frozen: reading it again gives the same questions.
+    again = client.get(f"/v1/tests/{test['id']}", headers=AUTH).json()
+    assert [q["id"] for q in again["questions"]] == [q["id"] for q in test["questions"]]
+    assert client.get(f"/v1/tests/{test['id']}", headers=OTHER).status_code == 404
+
+
+def test_test_is_never_short(client):
+    create_problem(client)
+    add(client, qcm("only-one"))
+    recipe = [{"language": "python", "level": 1, "code": 1}, {"language": "docker", "level": 2, "qcm": 2}]
+    response = client.post("/v1/tests", json={"recipe": recipe}, headers=AUTH)
+    assert response.status_code == 409
+    error = response.json()["error"]
+    assert error["code"] == "not_enough_questions"
+    assert error["shortages"] == [{"language": "docker", "level": 2, "kind": "qcm", "needed": 2, "available": 1}]
+
+
+def test_tests_in_one_scope_prefer_unused_questions(client):
+    for i in range(4):
+        add(client, qcm(f"q-{i}"))
+    recipe = [{"language": "docker", "level": 2, "qcm": 2}]
+    first = client.post("/v1/tests", json={"recipe": recipe, "scope": "acme"}, headers=AUTH).json()
+    second = client.post("/v1/tests", json={"recipe": recipe, "scope": "acme"}, headers=AUTH).json()
+    ids = lambda t: {q["id"] for q in t["questions"]}  # noqa: E731
+    assert not ids(first) & ids(second)
+    # Everything used: questions repeat rather than leave the test short.
+    third = client.post("/v1/tests", json={"recipe": recipe, "scope": "acme"}, headers=AUTH)
+    assert third.status_code == 201
+
+
+def test_recipe_is_validated(client):
+    dup = [{"language": "python", "level": 1, "code": 1}, {"language": "python", "level": 1, "qcm": 1}]
+    assert client.post("/v1/tests", json={"recipe": dup}, headers=AUTH).status_code == 400
+    empty = [{"language": "python", "level": 1}]
+    assert client.post("/v1/tests", json={"recipe": empty}, headers=AUTH).status_code == 400
+
+
+def test_question_in_a_test_cannot_be_deleted(client):
+    question = add(client, qcm("ps"))
+    client.post("/v1/tests", json={"recipe": [{"language": "docker", "level": 2, "qcm": 1}]}, headers=AUTH)
+    response = client.delete(f"/v1/problems/{question['id']}", headers=AUTH)
+    assert response.status_code == 409

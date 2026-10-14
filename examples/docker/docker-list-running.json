@@ -1,0 +1,18 @@
+{
+  "slug": "docker-list-running",
+  "title": "List running containers",
+  "kind": "qcm",
+  "language": "docker",
+  "level": 2,
+  "statement": "Which command lists only the containers that are running right now?",
+  "choices": [
+    "docker ps",
+    "docker ps -a",
+    "docker images",
+    "docker container prune"
+  ],
+  "correct_choices": [
+    0
+  ],
+  "timer_seconds": 60
+}
