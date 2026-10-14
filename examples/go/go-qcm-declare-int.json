@@ -1,0 +1,20 @@
+{
+  "slug": "go-qcm-declare-int",
+  "title": "Declaring a variable",
+  "kind": "qcm",
+  "language": "go",
+  "level": 1,
+  "statement": "Inside a function body, where no variable x exists yet, which of these lines declare a new variable x of type int holding 5? Pick every one that applies.",
+  "choices": [
+    "x := 5",
+    "var x = 5",
+    "var x int = 5",
+    "x = 5"
+  ],
+  "correct_choices": [
+    0,
+    1,
+    2
+  ],
+  "timer_seconds": 60
+}

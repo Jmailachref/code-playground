@@ -31,6 +31,8 @@ def cell(value):
 
 def main():
     db = sqlite3.connect(":memory:", isolation_level=None)
+    # The sandbox's filesystem is read-only, so large sorts must not spill to temp files.
+    db.execute("PRAGMA temp_store = MEMORY")
     try:
         db.executescript(sys.stdin.read())
     except sqlite3.Error as exc:

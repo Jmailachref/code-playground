@@ -1,0 +1,19 @@
+{
+  "slug": "java-record-facts",
+  "title": "What a record gives you",
+  "kind": "qcm",
+  "language": "java",
+  "level": 3,
+  "statement": "Which statements about record Point(int x, int y) {} are true in Java 21? Pick every one that applies.",
+  "choices": [
+    "x and y become private final fields, read through the accessors x() and y().",
+    "It can extend another class, as in record Point(int x, int y) extends Shape {}.",
+    "It can declare an extra instance field in its body, such as private int cache;.",
+    "equals(), hashCode() and toString() are generated from its components."
+  ],
+  "correct_choices": [
+    0,
+    3
+  ],
+  "timer_seconds": 90
+}

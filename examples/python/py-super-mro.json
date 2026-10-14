@@ -1,0 +1,18 @@
+{
+  "slug": "py-super-mro",
+  "title": "super() and the MRO",
+  "kind": "qcm",
+  "language": "python",
+  "level": 4,
+  "statement": "What does this code print?\n\nclass A:\n    def who(self):\n        return \"A\"\n\nclass B(A):\n    def who(self):\n        return \"B\" + super().who()\n\nclass C(A):\n    def who(self):\n        return \"C\" + super().who()\n\nclass D(B, C):\n    def who(self):\n        return \"D\" + super().who()\n\nprint(D().who())\n",
+  "choices": [
+    "DBA",
+    "DBACA",
+    "DCBA",
+    "DBCA"
+  ],
+  "correct_choices": [
+    3
+  ],
+  "timer_seconds": 120
+}

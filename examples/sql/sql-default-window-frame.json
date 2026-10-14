@@ -1,0 +1,18 @@
+{
+  "slug": "sql-default-window-frame",
+  "title": "Running sum with ties",
+  "kind": "qcm",
+  "language": "sql",
+  "level": 4,
+  "statement": "Table sales(day INTEGER, amount INTEGER) contains:\n  (1, 10)\n  (2, 20)\n  (2, 5)\n  (3, 1)\n\nSELECT day, amount,\n       SUM(amount) OVER (ORDER BY day) AS running\nFROM sales\nORDER BY day, amount;\n\nWhat is running on the row (day 2, amount 5)?",
+  "choices": [
+    "15",
+    "35",
+    "30",
+    "36"
+  ],
+  "correct_choices": [
+    1
+  ],
+  "timer_seconds": 120
+}

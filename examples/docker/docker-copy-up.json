@@ -1,0 +1,18 @@
+{
+  "slug": "docker-copy-up",
+  "title": "Writing to a large image file",
+  "kind": "qcm",
+  "language": "docker",
+  "level": 5,
+  "statement": "An image layer contains a 2 GB file /data/big.db. The container's storage uses overlay (the overlay2 driver or the containerd overlayfs snapshotter). A process in the container opens the file for writing and changes 10 bytes. What happens?",
+  "choices": [
+    "Only the 10 changed bytes are stored in the container's writable layer as a block diff",
+    "The write fails because image layers are read-only",
+    "The whole file is copied up into the container's writable layer first, then modified there",
+    "The change is written into the image layer and is visible to every container using that image"
+  ],
+  "correct_choices": [
+    2
+  ],
+  "timer_seconds": 120
+}

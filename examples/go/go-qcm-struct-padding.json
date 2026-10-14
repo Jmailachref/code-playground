@@ -1,0 +1,18 @@
+{
+  "slug": "go-qcm-struct-padding",
+  "title": "Struct size and field order",
+  "kind": "qcm",
+  "language": "go",
+  "level": 5,
+  "statement": "This program is built with the standard gc compiler for linux/amd64. What does it print?\n\npackage main\n\nimport (\n\t\"fmt\"\n\t\"unsafe\"\n)\n\ntype A struct {\n\tx bool\n\ty int64\n\tz bool\n}\n\ntype B struct {\n\ty int64\n\tx bool\n\tz bool\n}\n\nfunc main() {\n\tfmt.Println(unsafe.Sizeof(A{}), unsafe.Sizeof(B{}))\n}",
+  "choices": [
+    "10 10",
+    "16 16",
+    "24 16",
+    "24 24"
+  ],
+  "correct_choices": [
+    2
+  ],
+  "timer_seconds": 120
+}

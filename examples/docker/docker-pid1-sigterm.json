@@ -1,0 +1,18 @@
+{
+  "slug": "docker-pid1-sigterm",
+  "title": "docker stop and PID 1",
+  "kind": "qcm",
+  "language": "docker",
+  "level": 5,
+  "statement": "An image has `CMD [\"python\", \"server.py\"]` and server.py installs no signal handlers. You run `docker stop` on the container with the default options. What happens?",
+  "choices": [
+    "Python receives SIGTERM, which is ignored because it runs as PID 1 with no handler; after 10 seconds Docker sends SIGKILL and the container exits with code 137",
+    "Python is terminated immediately by SIGTERM and the container exits with code 143",
+    "Docker sends SIGINT, Python raises KeyboardInterrupt and the container exits with code 130",
+    "The exec form starts Python under /bin/sh -c, which forwards SIGTERM, so Python exits at once with code 0"
+  ],
+  "correct_choices": [
+    0
+  ],
+  "timer_seconds": 120
+}

@@ -1,0 +1,49 @@
+{
+  "slug": "go-delivery-route",
+  "title": "Shortest delivery round",
+  "kind": "code",
+  "language": "go",
+  "level": 5,
+  "statement": "A courier starts at stop 1, must visit every other stop exactly once, and then return to stop 1. Travel times are given as a matrix: d[i][j] is the time to go from stop i to stop j. The matrix is not necessarily symmetric (d[i][j] can differ from d[j][i]) and does not necessarily satisfy the triangle inequality. Print the smallest total travel time of such a round.\n\nInput: the first line holds n (1 <= n <= 16). Each of the next n lines holds n integers: line i holds d[i][1] .. d[i][n] (0 <= d[i][j] <= 1000000, d[i][i] = 0).\n\nOutput: one line with the minimum total time. With n = 1 the courier does not move and the answer is 0. Trying every order (15! of them) is far too slow for n = 16.\n\nExample\nInput:\n4\n0 10 15 20\n5 0 9 10\n6 13 0 12\n8 8 9 0\nOutput:\n35\n(1 -> 2 -> 4 -> 3 -> 1 takes 10 + 10 + 9 + 6 = 35.)",
+  "starter_code": "package main\n\nimport (\n\t\"bufio\"\n\t\"fmt\"\n\t\"os\"\n)\n\nfunc main() {\n\treader := bufio.NewReader(os.Stdin)\n\tvar n int\n\tfmt.Fscan(reader, &n)\n\td := make([][]int, n)\n\tfor i := range d {\n\t\td[i] = make([]int, n)\n\t\tfor j := range d[i] {\n\t\t\tfmt.Fscan(reader, &d[i][j])\n\t\t}\n\t}\n\t// Print the shortest round that starts and ends at stop 1\n}\n",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 256,
+  "comparator": "trim",
+  "timer_seconds": 1800,
+  "scenarios": [
+    {
+      "name": "Example",
+      "input": "4\n0 10 15 20\n5 0 9 10\n6 13 0 12\n8 8 9 0\n",
+      "expected_output": "35\n"
+    },
+    {
+      "name": "Two stops",
+      "input": "2\n0 7\n3 0\n",
+      "expected_output": "10\n"
+    },
+    {
+      "name": "One stop",
+      "input": "1\n0\n",
+      "expected_output": "0\n",
+      "hidden": true
+    },
+    {
+      "name": "Asymmetric 8",
+      "input": "8\n0 46 34 73 36 39 48 16\n26 0 79 68 47 50 1 74\n29 1 0 1 22 93 46 2\n61 72 15 0 56 38 60 11\n62 79 95 54 0 21 69 88\n54 76 75 85 69 0 53 45\n7 12 69 26 32 42 0 8\n81 24 4 56 6 46 80 0\n",
+      "expected_output": "152\n",
+      "hidden": true
+    },
+    {
+      "name": "16 stops",
+      "input": "16\n0 433311 377773 671717 310232 406868 410144 551461 910631 61630 98814 743770 355157 926046 969139 852924\n724542 0 965241 444953 967172 665656 324914 386396 900098 584976 865266 125975 497595 662455 117618 131093\n345823 333307 0 547249 777103 846940 618469 312801 943425 328764 506244 522766 590758 574445 304999 976093\n382289 333165 844482 0 166990 663219 138190 569415 924416 260811 276060 60769 531223 15959 761350 999245\n930800 609371 147575 857278 0 5679 508101 742611 406309 404842 657294 238828 199083 30605 133312 555463\n439787 756108 262474 565973 324493 0 353417 179516 498992 871197 453696 436328 620510 826861 734497 174826\n20706 331140 261665 198266 197661 82572 0 196405 151707 936845 364786 629545 319181 289369 556340 923787\n221140 594204 576189 142450 679387 184449 968681 0 639296 392241 803161 732300 943050 773596 645215 491155\n127705 783926 663020 120112 576801 998403 740720 713744 0 437204 31291 835597 252000 317641 478505 156979\n655996 150311 60470 955023 894508 796232 105925 824157 609085 0 745655 177015 708429 225256 245466 81189\n63951 472620 122974 476975 775342 559804 735964 114552 854418 507995 0 727469 123689 636222 217784 496349\n923283 358107 622944 761793 948729 734627 521487 968386 368561 679819 939994 0 816633 779005 354697 615256\n930057 554127 537773 966415 216566 305283 467699 61803 111787 643517 227870 671672 0 316592 618081 785473\n265149 842381 23365 745604 903413 190944 74519 141866 971829 369434 404399 907758 708579 0 160755 893926\n213292 428589 184049 999517 29388 763331 71522 445846 564738 108486 533259 384330 973084 28752 0 969975\n934991 75855 934994 54695 851203 633375 53451 702298 606260 115154 737477 231881 618049 330719 468688 0\n",
+      "expected_output": "1677800\n",
+      "hidden": true
+    },
+    {
+      "name": "16 stops small weights",
+      "input": "16\n0 4 5 4 5 9 6 8 7 6 3 5 2 5 7 5\n2 0 4 7 7 3 8 4 7 6 1 5 2 1 6 3\n2 3 0 7 6 7 3 5 2 2 4 6 5 6 4 4\n4 5 5 0 6 6 2 7 5 2 1 9 8 9 1 3\n2 6 1 5 0 9 8 9 3 9 9 2 6 8 1 4\n8 1 7 3 8 0 7 7 1 3 7 9 8 3 8 3\n6 6 3 7 3 9 0 6 2 9 2 6 4 7 6 8\n8 7 5 8 2 7 4 0 7 8 3 4 2 1 9 9\n1 3 1 5 4 5 1 6 0 4 5 8 5 9 2 2\n7 6 8 7 7 8 8 9 3 0 5 3 6 3 9 4\n7 9 3 2 1 6 6 8 7 7 0 3 1 7 3 3\n2 5 8 8 8 7 9 6 6 2 8 0 6 6 1 5\n6 7 4 3 8 7 1 6 7 4 1 1 0 1 6 6\n4 2 5 6 6 6 5 5 5 1 6 9 4 0 5 3\n4 4 3 8 8 4 9 4 7 1 7 8 5 9 0 7\n6 6 9 1 8 3 1 6 2 4 6 7 3 4 5 0\n",
+      "expected_output": "29\n",
+      "hidden": true
+    }
+  ]
+}

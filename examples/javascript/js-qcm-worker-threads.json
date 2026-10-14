@@ -1,0 +1,19 @@
+{
+  "slug": "js-qcm-worker-threads",
+  "title": "worker_threads",
+  "kind": "qcm",
+  "language": "javascript",
+  "level": 5,
+  "statement": "Which statements about the worker_threads module in Node.js 22 are true? Pick every one that applies.",
+  "choices": [
+    "Each Worker runs its own V8 isolate with its own event loop, so a CPU-bound loop inside a worker does not block the main thread's event loop.",
+    "An object sent with worker.postMessage(obj) is shared by reference, so changes the worker makes to it are visible in the main thread.",
+    "A SharedArrayBuffer passed to a worker is shared without copying, and Atomics can be used to synchronise access to it.",
+    "Workers share the main thread's global variables and require() cache, so a module loaded in the main thread is not evaluated again in a worker."
+  ],
+  "correct_choices": [
+    0,
+    2
+  ],
+  "timer_seconds": 120
+}

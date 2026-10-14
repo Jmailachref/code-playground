@@ -1,0 +1,18 @@
+{
+  "slug": "js-qcm-event-loop-order",
+  "title": "Event loop order",
+  "kind": "qcm",
+  "language": "javascript",
+  "level": 3,
+  "statement": "In what order are the letters printed (Node.js 22, run as a script with node main.js, CommonJS)?\n\nconsole.log(\"A\");\nsetTimeout(() => console.log(\"B\"), 0);\nPromise.resolve().then(() => console.log(\"C\"));\nprocess.nextTick(() => console.log(\"D\"));\nconsole.log(\"E\");",
+  "choices": [
+    "A E C D B",
+    "A E D C B",
+    "A E B D C",
+    "A D C E B"
+  ],
+  "correct_choices": [
+    1
+  ],
+  "timer_seconds": 90
+}

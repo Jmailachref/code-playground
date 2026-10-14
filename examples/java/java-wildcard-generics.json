@@ -1,0 +1,18 @@
+{
+  "slug": "java-wildcard-generics",
+  "title": "Upper-bounded wildcards",
+  "kind": "qcm",
+  "language": "java",
+  "level": 4,
+  "statement": "Given\n\nList<? extends Number> nums = new ArrayList<Integer>();\n\nwhich one of these statements compiles?",
+  "choices": [
+    "nums.add(1);",
+    "Integer i = nums.get(0);",
+    "Number n = nums.get(0);",
+    "nums.add(Integer.valueOf(1));"
+  ],
+  "correct_choices": [
+    2
+  ],
+  "timer_seconds": 120
+}

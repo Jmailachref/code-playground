@@ -1,0 +1,18 @@
+{
+  "slug": "go-qcm-loop-closure",
+  "title": "Closures in a for loop",
+  "kind": "qcm",
+  "language": "go",
+  "level": 3,
+  "statement": "This program is compiled with Go 1.23. What does it print?\n\npackage main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar fs []func()\n\tfor i := 0; i < 3; i++ {\n\t\tfs = append(fs, func() { fmt.Print(i) })\n\t}\n\tfor _, f := range fs {\n\t\tf()\n\t}\n\tfmt.Println()\n}",
+  "choices": [
+    "333",
+    "222",
+    "The output changes from run to run",
+    "012"
+  ],
+  "correct_choices": [
+    3
+  ],
+  "timer_seconds": 90
+}

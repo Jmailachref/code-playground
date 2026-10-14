@@ -1,0 +1,18 @@
+{
+  "slug": "docker-named-volume",
+  "title": "Named volume after container removal",
+  "kind": "qcm",
+  "language": "docker",
+  "level": 2,
+  "statement": "You start a database with `docker run -d --name db -v pgdata:/var/lib/postgresql/data postgres:16`, write some data, then run `docker rm -f db`. What happens to the volume pgdata?",
+  "choices": [
+    "It is deleted together with the container",
+    "It is kept only because the container was force-removed instead of stopped first",
+    "It is kept, and a new container started with -v pgdata:/var/lib/postgresql/data sees the same data",
+    "Its data is committed into the postgres:16 image"
+  ],
+  "correct_choices": [
+    2
+  ],
+  "timer_seconds": 60
+}

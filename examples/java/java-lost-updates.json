@@ -1,0 +1,19 @@
+{
+  "slug": "java-lost-updates",
+  "title": "Lost updates between threads",
+  "kind": "qcm",
+  "language": "java",
+  "level": 5,
+  "statement": "A static int field count starts at 0. Two threads each run\n\nfor (int i = 0; i < 100_000; i++) count++;\n\nand main starts both, joins both, then prints count. The output is often below 200000. Which changes guarantee that it prints 200000? Pick every one that applies.",
+  "choices": [
+    "Declare the field as static volatile int count.",
+    "Replace the field with a static AtomicInteger and call incrementAndGet() in the loop.",
+    "Wrap count++ in synchronized (Main.class) { ... } in both threads.",
+    "Call Thread.yield() after each count++ so the threads take turns."
+  ],
+  "correct_choices": [
+    1,
+    2
+  ],
+  "timer_seconds": 120
+}

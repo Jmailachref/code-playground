@@ -1,0 +1,18 @@
+{
+  "slug": "cpp-move-if-noexcept",
+  "title": "Vector growth and noexcept",
+  "kind": "qcm",
+  "language": "cpp",
+  "level": 4,
+  "statement": "What does this program print?\n\n#include <iostream>\n#include <vector>\nstruct T {\n    T() = default;\n    T(const T&) { std::cout << \"C\"; }\n    T(T&&) { std::cout << \"M\"; }\n};\nint main() {\n    std::vector<T> v;\n    v.reserve(1);\n    v.emplace_back();\n    v.emplace_back();  // grows: the old element is transferred\n    std::cout << \"\\n\";\n}\n",
+  "choices": [
+    "M",
+    "CM",
+    "C",
+    "An empty line: the old element is relocated with memcpy"
+  ],
+  "correct_choices": [
+    2
+  ],
+  "timer_seconds": 120
+}

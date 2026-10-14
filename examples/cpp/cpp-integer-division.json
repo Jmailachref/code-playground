@@ -1,0 +1,18 @@
+{
+  "slug": "cpp-integer-division",
+  "title": "Integer division",
+  "kind": "qcm",
+  "language": "cpp",
+  "level": 1,
+  "statement": "What does this program print?\n\n#include <iostream>\nint main() {\n    int x = 7 / 2;\n    double y = 7 / 2;\n    std::cout << x << \" \" << y << \"\\n\";\n}\n",
+  "choices": [
+    "3.5 3.5",
+    "3 3.5",
+    "3 3",
+    "4 3.5"
+  ],
+  "correct_choices": [
+    2
+  ],
+  "timer_seconds": 60
+}

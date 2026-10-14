@@ -1,0 +1,19 @@
+{
+  "slug": "js-qcm-nan-checks",
+  "title": "Detecting NaN",
+  "kind": "qcm",
+  "language": "javascript",
+  "level": 3,
+  "statement": "Which of these expressions evaluate to true? Pick every one that applies.",
+  "choices": [
+    "NaN === NaN",
+    "Object.is(NaN, NaN)",
+    "[NaN].indexOf(NaN) !== -1",
+    "[NaN].includes(NaN)"
+  ],
+  "correct_choices": [
+    1,
+    3
+  ],
+  "timer_seconds": 90
+}

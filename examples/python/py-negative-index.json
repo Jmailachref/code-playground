@@ -1,0 +1,18 @@
+{
+  "slug": "py-negative-index",
+  "title": "Negative list index",
+  "kind": "qcm",
+  "language": "python",
+  "level": 1,
+  "statement": "What does this code print?\n\nnums = [10, 20, 30, 40]\nprint(nums[-1])\n",
+  "choices": [
+    "10",
+    "40",
+    "30",
+    "It raises IndexError"
+  ],
+  "correct_choices": [
+    1
+  ],
+  "timer_seconds": 60
+}

@@ -1,0 +1,19 @@
+{
+  "slug": "java-string-equality",
+  "title": "Comparing strings",
+  "kind": "qcm",
+  "language": "java",
+  "level": 1,
+  "statement": "Given\n\nString a = \"java\";\nString b = new String(\"java\");\n\nwhich expressions evaluate to true? Pick every one that applies.",
+  "choices": [
+    "a == b",
+    "a.equals(b)",
+    "a.hashCode() != b.hashCode()",
+    "java.util.Objects.equals(a, b)"
+  ],
+  "correct_choices": [
+    1,
+    3
+  ],
+  "timer_seconds": 60
+}

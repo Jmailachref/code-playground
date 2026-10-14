@@ -1,0 +1,18 @@
+{
+  "slug": "cpp-map-order",
+  "title": "Iterating a std::map",
+  "kind": "qcm",
+  "language": "cpp",
+  "level": 2,
+  "statement": "What does this program print?\n\n#include <iostream>\n#include <map>\n#include <string>\nint main() {\n    std::map<int, std::string> m;\n    m[3] = \"c\";\n    m[1] = \"a\";\n    m[2] = \"b\";\n    m[1] = \"z\";\n    for (const auto& [k, v] : m) std::cout << k << v;\n    std::cout << \"\\n\";\n}\n",
+  "choices": [
+    "3c1z2b",
+    "1a2b3c",
+    "1z2b3c",
+    "Nothing fixed: std::map iterates in an unspecified order"
+  ],
+  "correct_choices": [
+    2
+  ],
+  "timer_seconds": 60
+}

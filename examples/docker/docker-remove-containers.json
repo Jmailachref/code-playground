@@ -1,0 +1,19 @@
+{
+  "slug": "docker-remove-containers",
+  "title": "Remove stopped containers",
+  "kind": "qcm",
+  "language": "docker",
+  "level": 1,
+  "statement": "You have several stopped containers you no longer need. Which commands delete stopped containers? Pick every one that applies.",
+  "choices": [
+    "docker rm <container>",
+    "docker rmi <container>",
+    "docker container prune",
+    "docker stop <container>"
+  ],
+  "correct_choices": [
+    0,
+    2
+  ],
+  "timer_seconds": 60
+}

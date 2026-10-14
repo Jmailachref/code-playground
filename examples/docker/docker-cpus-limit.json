@@ -1,0 +1,18 @@
+{
+  "slug": "docker-cpus-limit",
+  "title": "What --cpus limits",
+  "kind": "qcm",
+  "language": "docker",
+  "level": 4,
+  "statement": "On a host with 8 CPU cores, you run `docker run --cpus=1.5 myapp`. What does this do?",
+  "choices": [
+    "Pins the container to cores 0 and 1",
+    "Reserves 1.5 cores so no other process can use them",
+    "Sets the container's relative CPU weight to 1.5 times the default, used only when CPUs are contended",
+    "Caps the container's total CPU time at 1.5 cores' worth per scheduling period, spread over any cores"
+  ],
+  "correct_choices": [
+    3
+  ],
+  "timer_seconds": 120
+}

@@ -1,0 +1,43 @@
+{
+  "slug": "cpp-digit-stats",
+  "title": "Digit count and digit sum",
+  "kind": "code",
+  "language": "cpp",
+  "level": 1,
+  "statement": "Read one non-negative integer n and print two numbers on one line, separated by a space: how many digits n has, and the sum of its digits.\n\nInput: one line with n (0 <= n <= 10^18).\nOutput: one line \"D S\" where D is the number of digits of n (written without leading zeros) and S is the sum of those digits. The number 0 has 1 digit.\n\nExample\nInput:\n90210\nOutput:\n5 12\n(5 digits, 9+0+2+1+0 = 12)",
+  "starter_code": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    long long n;\n    cin >> n;\n    // Print the number of digits of n and the sum of its digits\n}\n",
+  "time_limit_ms": 1000,
+  "memory_limit_mb": 256,
+  "comparator": "trim",
+  "timer_seconds": 600,
+  "scenarios": [
+    {
+      "name": "Example",
+      "input": "90210\n",
+      "expected_output": "5 12\n"
+    },
+    {
+      "name": "Single digit",
+      "input": "7\n",
+      "expected_output": "1 7\n"
+    },
+    {
+      "name": "Zero",
+      "input": "0\n",
+      "expected_output": "1 0\n",
+      "hidden": true
+    },
+    {
+      "name": "Largest value",
+      "input": "1000000000000000000\n",
+      "expected_output": "19 1\n",
+      "hidden": true
+    },
+    {
+      "name": "All nines",
+      "input": "999999999999999999\n",
+      "expected_output": "18 162\n",
+      "hidden": true
+    }
+  ]
+}

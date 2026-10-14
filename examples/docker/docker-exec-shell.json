@@ -1,0 +1,18 @@
+{
+  "slug": "docker-exec-shell",
+  "title": "Open a shell in a running container",
+  "kind": "qcm",
+  "language": "docker",
+  "level": 1,
+  "statement": "A container named web is already running and its image has /bin/sh. Which command opens an interactive shell inside that same container?",
+  "choices": [
+    "docker run -it web sh",
+    "docker attach web sh",
+    "docker start -i web sh",
+    "docker exec -it web sh"
+  ],
+  "correct_choices": [
+    3
+  ],
+  "timer_seconds": 60
+}

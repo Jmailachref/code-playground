@@ -1,0 +1,18 @@
+{
+  "slug": "js-qcm-async-foreach",
+  "title": "async callbacks in forEach",
+  "kind": "qcm",
+  "language": "javascript",
+  "level": 4,
+  "statement": "What does this code print (Node.js 22, run as a script with node main.js)?\n\nconst sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));\nasync function main() {\n  const out = [];\n  [30, 10, 20].forEach(async (ms) => {\n    await sleep(ms);\n    out.push(ms);\n  });\n  console.log(out.join(\",\") || \"(empty)\");\n  await sleep(100);\n  console.log(out.join(\",\"));\n}\nmain();",
+  "choices": [
+    "30,10,20 then 30,10,20",
+    "10,20,30 then 10,20,30",
+    "(empty) then 30,10,20",
+    "(empty) then 10,20,30"
+  ],
+  "correct_choices": [
+    3
+  ],
+  "timer_seconds": 120
+}

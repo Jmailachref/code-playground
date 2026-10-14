@@ -1,0 +1,49 @@
+{
+  "slug": "go-digit-sum",
+  "title": "Sum of digits",
+  "kind": "code",
+  "language": "go",
+  "level": 1,
+  "statement": "Read one integer n and print the sum of its decimal digits. The sign does not count: the digits of -905 are 9, 0 and 5.\n\nInput: one line holding n (-10^18 <= n <= 10^18).\n\nOutput: one line with the sum of the digits of n.\n\nExample\nInput:\n-905\nOutput:\n14",
+  "starter_code": "package main\n\nimport (\n\t\"bufio\"\n\t\"fmt\"\n\t\"os\"\n)\n\nfunc main() {\n\treader := bufio.NewReader(os.Stdin)\n\tvar n int64\n\tfmt.Fscan(reader, &n)\n\t// Print the sum of the digits of n\n}\n",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 256,
+  "comparator": "trim",
+  "timer_seconds": 600,
+  "scenarios": [
+    {
+      "name": "Example",
+      "input": "-905\n",
+      "expected_output": "14\n"
+    },
+    {
+      "name": "Positive",
+      "input": "123456\n",
+      "expected_output": "21\n"
+    },
+    {
+      "name": "Zero",
+      "input": "0\n",
+      "expected_output": "0\n",
+      "hidden": true
+    },
+    {
+      "name": "Largest",
+      "input": "1000000000000000000\n",
+      "expected_output": "1\n",
+      "hidden": true
+    },
+    {
+      "name": "Smallest",
+      "input": "-1000000000000000000\n",
+      "expected_output": "1\n",
+      "hidden": true
+    },
+    {
+      "name": "Many nines",
+      "input": "999999999999999999\n",
+      "expected_output": "162\n",
+      "hidden": true
+    }
+  ]
+}

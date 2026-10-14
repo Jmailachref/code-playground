@@ -1,0 +1,18 @@
+{
+  "slug": "go-qcm-zero-values",
+  "title": "Zero values",
+  "kind": "qcm",
+  "language": "go",
+  "level": 1,
+  "statement": "What does this Go program print?\n\npackage main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar a int\n\tvar s string\n\tvar p *int\n\tfmt.Println(a, len(s), p == nil)\n}",
+  "choices": [
+    "0 0 false",
+    "0 0 true",
+    "<nil> 0 true",
+    "Nothing: it does not compile because a, s and p are used before being assigned"
+  ],
+  "correct_choices": [
+    1
+  ],
+  "timer_seconds": 60
+}

@@ -1,0 +1,18 @@
+{
+  "slug": "py-division-operators",
+  "title": "Division operators",
+  "kind": "qcm",
+  "language": "python",
+  "level": 1,
+  "statement": "What does this code print?\n\nprint(7 // 2, 7 % 2, 7 / 2)\n",
+  "choices": [
+    "3.5 1 3",
+    "3 1 3",
+    "3 1 3.5",
+    "4 1 3.5"
+  ],
+  "correct_choices": [
+    2
+  ],
+  "timer_seconds": 60
+}

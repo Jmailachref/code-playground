@@ -1,0 +1,18 @@
+{
+  "slug": "docker-restart-unless-stopped",
+  "title": "Restart policy after a manual stop",
+  "kind": "qcm",
+  "language": "docker",
+  "level": 4,
+  "statement": "A container was started with `--restart unless-stopped`. You run `docker stop` on it, and later the Docker daemon restarts (e.g. the host reboots). What happens to the container?",
+  "choices": [
+    "It is started again when the daemon comes back",
+    "It stays stopped until someone starts it",
+    "It is started again only if its last exit code was non-zero",
+    "It is removed, because unless-stopped containers are not kept after a daemon restart"
+  ],
+  "correct_choices": [
+    1
+  ],
+  "timer_seconds": 120
+}

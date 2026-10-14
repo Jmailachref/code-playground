@@ -1,0 +1,20 @@
+{
+  "slug": "py-immutable-types",
+  "title": "Immutable built-in types",
+  "kind": "qcm",
+  "language": "python",
+  "level": 2,
+  "statement": "Which of these built-in types are immutable? Pick every one that applies.",
+  "choices": [
+    "tuple",
+    "list",
+    "str",
+    "frozenset"
+  ],
+  "correct_choices": [
+    0,
+    2,
+    3
+  ],
+  "timer_seconds": 60
+}

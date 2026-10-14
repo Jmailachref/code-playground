@@ -1,0 +1,18 @@
+{
+  "slug": "cpp-pass-by-reference",
+  "title": "Passing by reference",
+  "kind": "qcm",
+  "language": "cpp",
+  "level": 2,
+  "statement": "What does this program print?\n\n#include <iostream>\nvoid f(int& x) { x++; }\nvoid g(int x) { x++; }\nint main() {\n    int a = 1;\n    f(a);\n    g(a);\n    f(a);\n    std::cout << a << \"\\n\";\n}\n",
+  "choices": [
+    "2",
+    "3",
+    "4",
+    "1"
+  ],
+  "correct_choices": [
+    1
+  ],
+  "timer_seconds": 60
+}

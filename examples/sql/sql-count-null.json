@@ -1,0 +1,18 @@
+{
+  "slug": "sql-count-null",
+  "title": "COUNT and NULL",
+  "kind": "qcm",
+  "language": "sql",
+  "level": 2,
+  "statement": "Table users(id INTEGER, email TEXT) contains:\n  (1, 'a@x.io')\n  (2, NULL)\n  (3, 'a@x.io')\n  (4, NULL)\n  (5, 'b@x.io')\n\nWhat does this query return?\n\nSELECT COUNT(*), COUNT(email), COUNT(DISTINCT email) FROM users;",
+  "choices": [
+    "5|5|3",
+    "5|3|3",
+    "3|3|2",
+    "5|3|2"
+  ],
+  "correct_choices": [
+    3
+  ],
+  "timer_seconds": 60
+}

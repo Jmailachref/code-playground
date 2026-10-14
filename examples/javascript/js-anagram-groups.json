@@ -1,0 +1,43 @@
+{
+  "slug": "js-anagram-groups",
+  "title": "Anagram groups",
+  "kind": "code",
+  "language": "javascript",
+  "level": 2,
+  "statement": "Two words are anagrams when one is a rearrangement of the letters of the other (\"listen\" and \"silent\"). A word with no anagram forms a group of its own.\nInput: the first line holds n (1 <= n <= 1000). Each of the next n lines holds one word of 1 to 20 lowercase letters a-z. All words are distinct.\nOutput: print every group of anagrams on its own line, its words sorted alphabetically and separated by single spaces. Print the groups from the largest to the smallest; groups of the same size are ordered by their first (alphabetically smallest) word.\n\nExample\nInput:\n6\nlisten\ngoogle\nenlist\ncat\nsilent\nact\nOutput:\nenlist listen silent\nact cat\ngoogle",
+  "starter_code": "const lines = require(\"fs\").readFileSync(0, \"utf8\").trim().split(\"\\n\");\nconst n = Number(lines[0]);\nconst words = lines.slice(1, n + 1).map((w) => w.trim());\n// Print the anagram groups\n",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 256,
+  "comparator": "trim",
+  "timer_seconds": 900,
+  "scenarios": [
+    {
+      "name": "Example",
+      "input": "6\nlisten\ngoogle\nenlist\ncat\nsilent\nact\n",
+      "expected_output": "enlist listen silent\nact cat\ngoogle\n"
+    },
+    {
+      "name": "Single word",
+      "input": "1\nword\n",
+      "expected_output": "word\n"
+    },
+    {
+      "name": "No anagrams",
+      "input": "4\ndog\nbird\nant\ncow\n",
+      "expected_output": "ant\nbird\ncow\ndog\n",
+      "hidden": true
+    },
+    {
+      "name": "Size ties",
+      "input": "6\nba\ncd\nab\ndc\nzz\na\n",
+      "expected_output": "ab ba\ncd dc\na\nzz\n",
+      "hidden": true
+    },
+    {
+      "name": "1000 words",
+      "input": "387\nbhbbea\nceb\ndcafbab\niehc\ncecea\ndifcf\nhdhag\ndgb\ndbdcjb\nbdcefej\ndbbebbi\nbhi\ndddjfii\naibg\naihhf\nfebc\njch\nijjfc\njcah\neacec\nehe\nchaajeh\nagh\nbhggfc\njhffj\nbebhba\ndbffg\nacj\nbfh\nbjbdcd\nicjb\ncdcbcd\nibedbbb\ndagdgbb\nfcibeai\nhcbggf\nchf\nbij\ndfabacb\neeacc\njdbj\njie\nhdbhgih\ncae\niid\nchg\nbagf\njieiidh\ngecai\nedei\naff\njca\nchie\ncffjeh\ncaj\naedbdch\ndbjeb\nibhai\neide\nhieddii\nageaej\nfgchbg\njhf\ndjbbcd\nffa\njbdj\nbge\ngjbgf\nhbi\njffh\ngbhhgc\nehd\nbfcghg\nhfa\ncjeiadg\njfggb\nddccbc\nidahc\ndfhj\nbdcfed\nagbf\nhdcb\niggc\nhceffj\nfjchef\nfhj\nfhfejc\nfbbdgha\njbi\nahcjhae\ngebfca\nhdbdb\ngfhcgb\njiidhei\nbhdbd\nfja\nbehcbf\ngbd\nibeefcj\ndcfabab\nfbgdf\ncfjhhcj\njfh\njfhfj\ncegfegi\ngah\nediida\nbhdc\naighggg\negic\ngch\nbbeidbb\nbgd\njiiafb\nehdbdca\nehi\neiidhdi\nahddif\ndbage\nfehfjc\niigejc\nhdihehb\ngigc\ngia\nebeijfc\naideid\nffjh\nebahgh\nibiccaa\niibaddh\nicgab\nhhaeb\ngjbjjda\ngfcfg\nchfebb\nieed\nbefc\ncfgedij\nagdeb\neaaaf\nidi\nadgfbhb\nhdeacbd\nbjdbfaj\nghfbcg\niaaihd\necb\ncdeebfj\nhee\nejicgi\niiiigcc\ndbhedca\nddbed\nddjbbc\nfhb\nfgcfg\nefgjh\nigicici\nhdjf\njfeicdg\nddiidjf\nfcggf\nbbaji\nigf\nejeicbf\neiacifb\nhbihhde\nhfegj\nbahbbe\ngbaf\ndeei\nhbcd\nbjaib\nigagggh\nehcd\ndddeb\nffggc\ngdabe\nadebg\nedaedd\nhde\nfiejgcd\nahifh\ncibj\ncbij\naaefa\nicgiiic\nghgcbh\nieidda\nccc\naaafe\nibehai\nfaf\ngbgjf\naeigc\negicfeg\nebdibbb\nhihdgbh\nijfiddd\ncfh\naicgb\ndjiidfd\ndhhebhi\nfchbgg\njhcchjf\nbeabhb\ncjehff\ngai\nddfecb\nbfagdbh\nfdiff\nhfejg\nhcbd\ndeadde\nbdcbaaf\nebcdfd\ngahh\nddidef\niacbg\nfiaceib\neefhhij\ncbdbdj\necah\naicge\nbdega\ngii\niedihdi\nibbaj\nahbegh\ncggi\niiadah\ncgffg\nbddhb\nahf\nfbbjdja\ngcfa\ndebecfj\neeicfbj\ncfbe\ndihiaa\nfghc\ngice\niabcg\ndbcccd\ncihe\nihiddba\ndabidih\ngahbeh\nibj\niej\nbcef\ndhjae\niegefcg\niciegj\niabefic\nfaeciib\nehjdiii\nfbchgg\nbefcjed\ndbgff\nihce\nhabeh\nhfj\nefcgab\nahcdi\negefcgi\nfhjf\neijhefh\nfeddid\nghha\nigb\nhcaid\nebafgc\nhdbc\nhjfcjhc\nddihaf\nahfhi\nafgb\nacjhhae\nfeaaa\ncjbi\njbgajdj\njhc\njbiba\necbdahd\nbdg\ndbhdcae\neiaidd\nffbgd\ncbcacc\njifjc\ngihbhdh\ncgh\ndjfddii\nfgac\nhgc\ngceiij\nacbafbd\nebhha\njfdihhg\nhbdc\nghgggai\nejcaahh\nhfb\ndihca\niddfdij\ndia\nfhfj\nfgi\neicfbai\nbfga\nihb\ndheiidi\niede\ncbddcc\nhdahg\nejficdg\ngbi\nbggcfh\njfbgg\nhag\nfbdajbj\nabe\nbehha\nfbegca\nbhhae\niaji\niad\ndef\nfjhjf\nbedfdc\nggic\ndfifc\nhhb\nhiedhhb\ncijfj\nbjiab\njcefhgc\neddbd\nfbh\nccccba\ndbdjcb\nghehba\nbfec\nefgjcdi\nigi\neijebfc\ngfi\naiggggh\nidaiah\nffhj\nefaaa\nhgha\naiided\nhagebh\ncddbcc\nafeaa\naid\ndii\ndbbdh\ndhhighb\ndeiida\ngbfghc\necaec\nhbh\necace\ndcahi\nceaec\nefd\nadbbfhg\nejfdebc\nhdec\neihidid\nhaebbb\ngfehjcc\nchbfbe\ndbcdcc\neceibjf\nddbde\nagcf\neaghbh\nfiiajb\ngaeci\nhhjecaa\ndjjb\nhaebh\nfhiah\n",
+      "expected_output": "bfcghg bggcfh bhggfc fbchgg fchbgg fgchbg gbfghc gfhcgb ghfbcg hcbggf\naaafe aaefa afeaa eaaaf efaaa feaaa\naedbdch dbhdcae dbhedca ecbdahd ehdbdca hdeacbd\nahbegh eaghbh ebahgh gahbeh ghehba hagebh\naideid aiided deiida ediida eiaidd ieidda\nbehha bhhae ebhha habeh haebh hhaeb\nbhdc hbcd hbdc hcbd hdbc hdcb\nbjbdcd cbdbdj dbdcjb dbdjcb ddjbbc djbbcd\ncbddcc cdcbcd cddbcc dbcccd dbcdcc ddccbc\nceaec cecea eacec ecace ecaec eeacc\ncffjeh cjehff fehfjc fhfejc fjchef hceffj\ndddjfii ddiidjf djfddii djiidfd iddfdij ijfiddd\nebeijfc eceibjf eeicfbj eijebfc ejeicbf ibeefcj\neiacifb eicfbai faeciib fcibeai fiaceib iabefic\nacbafbd bdcbaaf dcafbab dcfabab dfabacb\nacjhhae ahcjhae chaajeh ejcaahh hhjecaa\nadebg agdeb bdega dbage gdabe\nafgb agbf bagf bfga gbaf\nahcdi dcahi dihca hcaid idahc\nbahbbe beabhb bebhba bhbbea haebbb\nbbaji bjaib bjiab ibbaj jbiba\nbcef befc bfec cfbe febc\nbdcefej befcjed cdeebfj debecfj ejfdebc\ncfgedij efgjcdi ejficdg fiejgcd jfeicdg\ncgffg fcggf ffggc fgcfg gfcfg\ndeei edei eide iede ieed\ndheiidi eihidid eiidhdi hieddii iedihdi\nffhj ffjh fhfj fhjf jffh\nadbbfhg adgfbhb bfagdbh fbbdgha\naeigc aicge gaeci gecai\nahfhi ahifh aihhf fhiah\naicgb iabcg iacbg icgab\naiggggh aighggg ghgggai igagggh\nbbeidbb dbbebbi ebdibbb ibedbbb\nbdcfed bedfdc ddfecb ebcdfd\nbddhb bhdbd dbbdh hdbdb\nbdg bgd dgb gbd\nbfh fbh fhb hfb\ncbij cibj cjbi icjb\ncegfegi egefcgi egicfeg iegefcg\ncggi ggic gigc iggc\ncgh chg gch hgc\nchie cihe iehc ihce\ndbffg dbgff fbgdf ffbgd\nddbde ddbed dddeb eddbd\ndhhebhi hbihhde hdihehb hiedhhb\ndhhighb gihbhdh hdbhgih hihdgbh\ndihiaa iaaihd idaiah iiadah\nebafgc efcgab fbegca gebfca\nejicgi gceiij iciegj iigejc\nfhj hfj jfh jhf\ngbgjf gjbgf jfbgg jfggb\nacj caj jca\naff faf ffa\nagcf fgac gcfa\nagh gah hag\naid dia iad\nbehcbf chbfbe chfebb\nbhi hbi ihb\nbij ibj jbi\nbjdbfaj fbbjdja fbdajbj\ncfjhhcj hjfcjhc jhcchjf\ncijfj ijjfc jifjc\ndabidih ihiddba iibaddh\ndii idi iid\ndjjb jbdj jdbj\nefgjh hfegj hfejg\nehjdiii jieiidh jiidhei\nfgi gfi igf\nfjhjf jfhfj jhffj\ngahh ghha hgha\nicgiiic igicici iiiigcc\nahddif ddihaf\nahf hfa\ncbcacc ccccba\nceb ecb\ncfh chf\nddidef feddid\ndeadde edaedd\ndef efd\ndfhj hdjf\ndfifc difcf\neefhhij eijhefh\negic gice\nehcd hdec\nehd hde\nehe hee\nfiiajb jiiafb\ngai gia\ngbhhgc ghgcbh\ngbi igb\ngfehjcc jcefhgc\ngii igi\ngjbjjda jbgajdj\nhbh hhb\nhdahg hdhag\niej jie\njch jhc\nabe\nageaej\naibg\nbge\ncae\nccc\ncjeiadg\ndagdgbb\ndbjeb\ndhjae\necah\nehi\nfdiff\nfghc\nfja\niaji\nibehai\nibhai\nibiccaa\njcah\njfdihhg\n",
+      "hidden": true
+    }
+  ]
+}

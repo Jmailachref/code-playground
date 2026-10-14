@@ -1,0 +1,18 @@
+{
+  "slug": "docker-compose-service-dns",
+  "title": "Reach another Compose service",
+  "kind": "qcm",
+  "language": "docker",
+  "level": 3,
+  "statement": "A compose.yaml has two services, api and db (image postgres:16, with ports: [\"5433:5432\"]), and no networks section. Which address should the api container use to connect to Postgres?",
+  "choices": [
+    "db:5432",
+    "localhost:5433",
+    "db:5433",
+    "127.0.0.1:5432"
+  ],
+  "correct_choices": [
+    0
+  ],
+  "timer_seconds": 90
+}

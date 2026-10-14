@@ -1,0 +1,18 @@
+{
+  "slug": "java-stream-laziness",
+  "title": "Lazy streams",
+  "kind": "qcm",
+  "language": "java",
+  "level": 4,
+  "statement": "What does this code print?\n\nStream.of(1, 2, 3, 4)\n    .filter(x -> { System.out.print(\"f\" + x + \" \"); return x % 2 == 0; })\n    .map(x -> { System.out.print(\"m\" + x + \" \"); return x * 10; })\n    .findFirst();",
+  "choices": [
+    "f1 f2 f3 f4 m2 m4 ",
+    "f1 f2 m2 f3 f4 m4 ",
+    "Nothing: findFirst() is not enough to run the pipeline",
+    "f1 f2 m2 "
+  ],
+  "correct_choices": [
+    3
+  ],
+  "timer_seconds": 120
+}

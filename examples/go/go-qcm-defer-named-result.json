@@ -1,0 +1,18 @@
+{
+  "slug": "go-qcm-defer-named-result",
+  "title": "Defer and named results",
+  "kind": "qcm",
+  "language": "go",
+  "level": 3,
+  "statement": "What does this Go program print?\n\npackage main\n\nimport \"fmt\"\n\nfunc f() (r int) {\n\tdefer func() { r *= 2 }()\n\treturn 3\n}\n\nfunc main() {\n\tfmt.Println(f())\n}",
+  "choices": [
+    "3",
+    "0",
+    "6",
+    "Nothing: it does not compile because a deferred function cannot change a result"
+  ],
+  "correct_choices": [
+    2
+  ],
+  "timer_seconds": 90
+}

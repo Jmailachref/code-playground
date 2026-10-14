@@ -1,0 +1,18 @@
+{
+  "slug": "java-pass-by-value",
+  "title": "Arguments are passed by value",
+  "kind": "qcm",
+  "language": "java",
+  "level": 3,
+  "statement": "What does this program print?\n\nstatic void change(StringBuilder sb, String s) {\n    sb.append(\"!\");\n    s = s + \"!\";\n    sb = new StringBuilder(\"new\");\n}\n\npublic static void main(String[] args) {\n    StringBuilder sb = new StringBuilder(\"hi\");\n    String s = \"hi\";\n    change(sb, s);\n    System.out.println(sb + \" \" + s);\n}",
+  "choices": [
+    "hi! hi",
+    "new hi!",
+    "hi hi",
+    "new hi"
+  ],
+  "correct_choices": [
+    0
+  ],
+  "timer_seconds": 90
+}

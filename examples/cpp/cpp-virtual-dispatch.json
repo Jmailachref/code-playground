@@ -1,0 +1,18 @@
+{
+  "slug": "cpp-virtual-dispatch",
+  "title": "Virtual and non-virtual calls",
+  "kind": "qcm",
+  "language": "cpp",
+  "level": 3,
+  "statement": "What does this program print?\n\n#include <iostream>\nstruct Base {\n    void f() { std::cout << \"B\"; }\n    virtual void g() { std::cout << \"B\"; }\n};\nstruct Derived : Base {\n    void f() { std::cout << \"D\"; }\n    void g() override { std::cout << \"D\"; }\n};\nint main() {\n    Derived d;\n    Base* p = &d;\n    p->f();\n    p->g();\n    std::cout << \"\\n\";\n}\n",
+  "choices": [
+    "DD",
+    "DB",
+    "BB",
+    "BD"
+  ],
+  "correct_choices": [
+    3
+  ],
+  "timer_seconds": 90
+}

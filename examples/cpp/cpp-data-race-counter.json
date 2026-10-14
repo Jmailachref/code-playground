@@ -1,0 +1,20 @@
+{
+  "slug": "cpp-data-race-counter",
+  "title": "Fixing a racy counter",
+  "kind": "qcm",
+  "language": "cpp",
+  "level": 5,
+  "statement": "Two std::threads each run `for (int i = 0; i < 1000000; i++) counter++;` on a shared global `int counter = 0;`. The main thread joins both and then prints counter. Which changes guarantee that it prints 2000000? Pick every one that applies.",
+  "choices": [
+    "Declare counter as std::atomic<int> and keep counter++",
+    "Keep int counter but lock a shared std::mutex with std::lock_guard around counter++",
+    "Declare counter as volatile int",
+    "Declare counter as std::atomic<int> and use counter.fetch_add(1, std::memory_order_relaxed)"
+  ],
+  "correct_choices": [
+    0,
+    1,
+    3
+  ],
+  "timer_seconds": 120
+}

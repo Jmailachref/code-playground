@@ -1,0 +1,18 @@
+{
+  "slug": "sql-not-in-null",
+  "title": "NOT IN and NULL",
+  "kind": "qcm",
+  "language": "sql",
+  "level": 3,
+  "statement": "Table a(x INTEGER) contains the rows 1, 2 and 3. Table b(y INTEGER) contains the rows 2 and NULL.\n\nWhat does this query return?\n\nSELECT COUNT(*) FROM a WHERE x NOT IN (SELECT y FROM b);",
+  "choices": [
+    "2",
+    "1",
+    "0",
+    "An error: a NOT IN subquery cannot return NULL"
+  ],
+  "correct_choices": [
+    2
+  ],
+  "timer_seconds": 90
+}

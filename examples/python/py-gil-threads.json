@@ -1,0 +1,19 @@
+{
+  "slug": "py-gil-threads",
+  "title": "Threads and the GIL",
+  "kind": "qcm",
+  "language": "python",
+  "level": 4,
+  "statement": "In the standard CPython 3.13 build (with the GIL), which statements are true? Pick every one that applies.",
+  "choices": [
+    "Several threads running pure-Python CPU-bound code do not execute Python bytecode in parallel.",
+    "counter += 1 on a shared global int is atomic, so threads can update it without a lock.",
+    "asyncio runs coroutines on a pool of threads by default so that they use every core.",
+    "multiprocessing.Pool can speed up CPU-bound pure-Python work by using several cores."
+  ],
+  "correct_choices": [
+    0,
+    3
+  ],
+  "timer_seconds": 120
+}

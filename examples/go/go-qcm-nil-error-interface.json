@@ -1,0 +1,18 @@
+{
+  "slug": "go-qcm-nil-error-interface",
+  "title": "A nil pointer in an error",
+  "kind": "qcm",
+  "language": "go",
+  "level": 4,
+  "statement": "What does this Go program print?\n\npackage main\n\nimport \"fmt\"\n\ntype MyErr struct{}\n\nfunc (e *MyErr) Error() string { return \"boom\" }\n\nfunc find() error {\n\tvar p *MyErr = nil\n\treturn p\n}\n\nfunc main() {\n\tfmt.Println(find() == nil)\n}",
+  "choices": [
+    "false",
+    "true",
+    "Nothing: it panics with a nil pointer dereference",
+    "Nothing: it does not compile because nil cannot be returned as an error through a *MyErr"
+  ],
+  "correct_choices": [
+    0
+  ],
+  "timer_seconds": 120
+}
