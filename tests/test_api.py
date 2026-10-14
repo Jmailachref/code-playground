@@ -265,6 +265,21 @@ def test_ui_proxy_forwards_allowed_calls_without_a_key(client):
     assert client.get(f"/ui-api/runs/{run_id}").json()["stdout"] == "1\n"
 
 
+def test_ui_index_is_revalidated_and_assets_are_cached(tmp_path):
+    from fastapi import FastAPI
+    from api.ui import UIFiles
+
+    (tmp_path / "assets").mkdir()
+    (tmp_path / "index.html").write_text("<html></html>")
+    (tmp_path / "assets" / "index-abc123.js").write_text("console.log(1)")
+    ui = FastAPI()
+    ui.mount("/", UIFiles(directory=tmp_path, html=True))
+    browser = TestClient(ui)
+    assert browser.get("/").headers["cache-control"] == "no-cache"
+    assert browser.get("/index.html").headers["cache-control"] == "no-cache"
+    assert "immutable" in browser.get("/assets/index-abc123.js").headers["cache-control"]
+
+
 def test_ui_proxy_blocks_admin_calls(client):
     problem = create_problem(client)
     assert client.post("/ui-api/problems", json=PROBLEM).status_code == 404
