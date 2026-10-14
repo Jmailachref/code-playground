@@ -1,0 +1,12 @@
+display_name: "SQL (SQLite 3)"
+image: "codeplay/sql:3"
+source_file: "main.sql"
+compile: null
+run: ["python3", "/usr/local/lib/runsql.py", "main.sql"]
+time_multiplier: 1
+extra_memory_mb: 0
+template: |
+  -- The input (stdin) is SQL that runs first, on a fresh SQLite database:
+  -- use it to create and fill tables. Each row your queries return is
+  -- printed with its columns separated by "|".
+  SELECT 'Hello, ' || 'SQL' || '!';

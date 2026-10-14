@@ -69,7 +69,7 @@ def test_requires_api_key(client):
 
 def test_lists_languages(client):
     ids = [lang["id"] for lang in client.get("/v1/languages", headers=AUTH).json()]
-    assert ids == ["cpp", "go", "java", "javascript", "python"]
+    assert ids == ["cpp", "go", "java", "javascript", "python", "sql"]
 
 
 def test_playground_run(client):

@@ -5,6 +5,7 @@ import "monaco-editor/esm/vs/basic-languages/go/go.contribution";
 import "monaco-editor/esm/vs/basic-languages/java/java.contribution";
 import "monaco-editor/esm/vs/basic-languages/javascript/javascript.contribution";
 import "monaco-editor/esm/vs/basic-languages/python/python.contribution";
+import "monaco-editor/esm/vs/basic-languages/sql/sql.contribution";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import { useEffect, useState } from "react";
 
@@ -19,6 +20,7 @@ const monacoLanguage: Record<string, string> = {
   java: "java",
   cpp: "cpp",
   go: "go",
+  sql: "sql",
 };
 
 function useDarkMode(): boolean {
