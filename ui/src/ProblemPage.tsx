@@ -9,7 +9,7 @@ import {
   type SubmissionSummary,
 } from "./api";
 import { CodeEditor } from "./CodeEditor";
-import { LanguagePicker } from "./LanguagePicker";
+import { LevelBadge } from "./LevelBadge";
 import { load, save } from "./storage";
 import { VerdictBadge } from "./VerdictBadge";
 
@@ -29,11 +29,11 @@ const sameOutput = (a: string, b: string) => {
 export function ProblemPage({ problemId, languages, userId }: Props) {
   const [problem, setProblem] = useState<Problem | null>(null);
   const [loadError, setLoadError] = useState("");
-  const allowed = languages.filter((l) => !problem?.languages.length || problem.languages.includes(l.id));
-  const [language, setLanguage] = useState(() => load("problem:language", "python"));
-  const draftKey = (lang: string) => `draft:${problemId}:${lang}`;
-  const templateFor = (lang: string) => languages.find((l) => l.id === lang)?.template ?? "";
-  const [code, setCode] = useState(() => load(draftKey(language), templateFor(language)));
+  // Each question is solved in one language, set by the question itself.
+  const language = problem?.language ?? "";
+  const languageName = languages.find((l) => l.id === language)?.display_name ?? language;
+  const draftKey = `draft:${problemId}:${language}`;
+  const [code, setCode] = useState("");
   const [caseIndex, setCaseIndex] = useState(0);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [busy, setBusy] = useState<"" | "test" | "submit">("");
@@ -42,27 +42,22 @@ export function ProblemPage({ problemId, languages, userId }: Props) {
   const [history, setHistory] = useState<SubmissionSummary[]>([]);
 
   useEffect(() => {
-    api.problem(problemId).then(setProblem, () => setLoadError("Could not load this question."));
+    api.problem(problemId).then(
+      (p) => {
+        setProblem(p);
+        setCode(load(`draft:${problemId}:${p.language}`, p.starter_code));
+      },
+      () => setLoadError("Could not load this question."),
+    );
   }, [problemId]);
 
   useEffect(() => {
     if (tab === "history") api.history(problemId, userId).then(setHistory, () => setHistory([]));
   }, [tab, problemId, userId, outcome]);
 
-  useEffect(() => {
-    if (problem && allowed.length && !allowed.some((l) => l.id === language)) changeLanguage(allowed[0].id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [problem]);
-
-  function changeLanguage(id: string) {
-    setLanguage(id);
-    save("problem:language", id);
-    setCode(load(draftKey(id), templateFor(id)));
-  }
-
   function changeCode(value: string) {
     setCode(value);
-    save(draftKey(language), value);
+    save(draftKey, value);
   }
 
   async function act(kind: "test" | "submit") {
@@ -87,7 +82,6 @@ export function ProblemPage({ problemId, languages, userId }: Props) {
   async function openSubmission(id: string) {
     const submission = await api.submission(id);
     setOutcome({ kind: "submission", submission });
-    setLanguage(submission.language);
     setCode(submission.source_code);
     setTab("result");
   }
@@ -102,6 +96,10 @@ export function ProblemPage({ problemId, languages, userId }: Props) {
           ← All questions
         </a>
         <h1>{problem.title}</h1>
+        <p className="meta">
+          <LevelBadge level={problem.level} />
+          <span className="badge badge-neutral">{languageName}</span>
+        </p>
         <p className="muted">
           Time limit {problem.time_limit_ms} ms · Memory limit {problem.memory_limit_mb} MB
         </p>
@@ -132,8 +130,8 @@ export function ProblemPage({ problemId, languages, userId }: Props) {
 
       <section className="pane">
         <div className="toolbar">
-          <LanguagePicker languages={allowed} value={language} onChange={changeLanguage} />
-          <button className="button button-secondary" onClick={() => changeCode(templateFor(language))}>
+          <span className="toolbar-language">{languageName}</span>
+          <button className="button button-secondary" onClick={() => changeCode(problem.starter_code)}>
             Reset
           </button>
           <span className="spacer" />

@@ -18,6 +18,10 @@ from core.languages import Language
 
 SANDBOX_USER = "65534:65534"  # nobody
 PIDS_LIMIT = 64
+# Compilers need more memory than many programs are allowed (g++ with
+# <bits/stdc++.h> peaks around 250 MB), so compiled languages start with at
+# least this much and drop to the program's limit before it runs.
+COMPILE_MEMORY_MB = 768
 TMPFS = {
     "/tmp": "rw,exec,nosuid,size=256m,mode=1777",
     "/code": "rw,exec,nosuid,size=64m,mode=1777",
@@ -44,6 +48,7 @@ class Sandbox:
     def __init__(self, language: Language, memory_mb: int, client: docker.DockerClient | None = None):
         self.language = language
         self.memory_mb = memory_mb + language.extra_memory_mb
+        self.start_memory_mb = max(self.memory_mb, COMPILE_MEMORY_MB) if language.compile else self.memory_mb
         self.client = client or docker.from_env()
         self.container = None
 
@@ -56,8 +61,8 @@ class Sandbox:
                 network_mode="none",
                 read_only=True,
                 tmpfs=TMPFS,
-                mem_limit=f"{self.memory_mb}m",
-                memswap_limit=f"{self.memory_mb}m",
+                mem_limit=f"{self.start_memory_mb}m",
+                memswap_limit=f"{self.start_memory_mb}m",
                 nano_cpus=1_000_000_000,
                 pids_limit=PIDS_LIMIT,
                 user=SANDBOX_USER,
@@ -77,6 +82,15 @@ class Sandbox:
             except docker.errors.DockerException:
                 pass
             self.container = None
+
+    def restrict_memory(self) -> None:
+        """Lower the memory cap from the compile allowance to the program's limit."""
+        if self.start_memory_mb == self.memory_mb:
+            return
+        try:
+            self.container.update(mem_limit=f"{self.memory_mb}m", memswap_limit=f"{self.memory_mb}m")
+        except docker.errors.DockerException as exc:
+            raise SandboxError(f"could not set the memory limit: {exc}") from exc
 
     def write_file(self, name: str, content: bytes) -> None:
         exit_code, _ = self._exec(["sh", "-c", f'cat > "/code/{name}"'], stdin=content, timeout=30)

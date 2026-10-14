@@ -4,7 +4,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.db import Base
@@ -12,6 +12,7 @@ from core.db import Base
 
 class Problem(Base):
     __tablename__ = "problems"
+    __table_args__ = (CheckConstraint("level BETWEEN 1 AND 4", name="ck_problems_level"),)
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     slug: Mapped[str] = mapped_column(String(100), unique=True)
@@ -20,7 +21,9 @@ class Problem(Base):
     time_limit_ms: Mapped[int] = mapped_column(Integer, default=2000)
     memory_limit_mb: Mapped[int] = mapped_column(Integer, default=256)
     comparator: Mapped[str] = mapped_column(String(20), default="trim")
-    languages: Mapped[list[str]] = mapped_column(JSON, default=list)  # empty = all
+    language: Mapped[str] = mapped_column(String(30), index=True)
+    level: Mapped[int] = mapped_column(Integer, default=1, server_default="1", index=True)  # 1 beginner .. 4 expert
+    starter_code: Mapped[str | None] = mapped_column(Text)  # None = the language's template
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     scenarios: Mapped[list[Scenario]] = relationship(

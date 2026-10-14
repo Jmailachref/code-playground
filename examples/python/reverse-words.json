@@ -1,0 +1,29 @@
+{
+  "slug": "reverse-words",
+  "title": "Reverse the words",
+  "language": "python",
+  "level": 2,
+  "statement": "Read one line of text and print its words in reverse order, separated by single spaces.\n\nExample: \"hello big world\" becomes \"world big hello\".",
+  "time_limit_ms": 1000,
+  "memory_limit_mb": 256,
+  "comparator": "trim",
+  "starter_code": "line = input()\n# Print the words of line in reverse order\n",
+  "scenarios": [
+    {
+      "name": "Three words",
+      "input": "hello big world\n",
+      "expected_output": "world big hello\n"
+    },
+    {
+      "name": "One word",
+      "input": "single\n",
+      "expected_output": "single\n"
+    },
+    {
+      "name": "Extra spaces",
+      "input": "  a   b  c \n",
+      "expected_output": "c b a\n",
+      "hidden": true
+    }
+  ]
+}

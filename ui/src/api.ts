@@ -19,10 +19,14 @@ export interface Language {
   template: string;
 }
 
+export type Level = 1 | 2 | 3 | 4;
+
 export interface ProblemSummary {
   id: string;
   slug: string;
   title: string;
+  language: string;
+  level: Level;
 }
 
 export interface TestCase {
@@ -36,7 +40,7 @@ export interface Problem extends ProblemSummary {
   statement: string;
   time_limit_ms: number;
   memory_limit_mb: number;
-  languages: string[];
+  starter_code: string;
   scenarios: TestCase[];
   hidden_scenarios: number;
 }
@@ -133,6 +137,13 @@ export const api = {
       "GET",
       `submissions?${new URLSearchParams({ problem_id, user_id })}`,
     ),
+};
+
+export const levelLabel: Record<Level, string> = {
+  1: "Beginner",
+  2: "Intermediate",
+  3: "Advanced",
+  4: "Expert",
 };
 
 export const verdictLabel: Record<Verdict, string> = {

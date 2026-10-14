@@ -1,0 +1,35 @@
+{
+  "slug": "palindrome",
+  "title": "Palindrome check",
+  "language": "java",
+  "level": 1,
+  "statement": "Read one line. Ignoring case and every character that is not a letter or digit, print YES if it reads the same forwards and backwards, otherwise NO.",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 256,
+  "comparator": "trim",
+  "starter_code": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        String line = in.nextLine();\n        // Print YES or NO\n    }\n}\n",
+  "scenarios": [
+    {
+      "name": "Classic",
+      "input": "A man, a plan, a canal: Panama\n",
+      "expected_output": "YES\n"
+    },
+    {
+      "name": "Not one",
+      "input": "hello\n",
+      "expected_output": "NO\n"
+    },
+    {
+      "name": "Digits",
+      "input": "12321\n",
+      "expected_output": "YES\n",
+      "hidden": true
+    },
+    {
+      "name": "Almost",
+      "input": "ab\n",
+      "expected_output": "NO\n",
+      "hidden": true
+    }
+  ]
+}
