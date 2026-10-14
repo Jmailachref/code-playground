@@ -90,13 +90,17 @@ cd ui && npm install && npm run dev    # http://localhost:5173, proxies /ui-api 
 | GET | /v1/languages | Supported languages and starter templates |
 | POST | /v1/runs | Playground: run code once with custom stdin |
 | GET | /v1/runs/{id} | Run status and output |
-| GET, POST | /v1/problems | List questions (filter with `?language=| GET, POST | /v1/problems | List questions, or create one with its test cases |level=`), or create one with its test cases |
-| GET, PATCH, DELETE | /v1/problems/{id} | Read (visible test cases only), edit, delete |
+| GET, POST | /v1/problems | List questions (filter with `?language=&level=&kind=&status=`), or create one |
+| GET, PATCH, DELETE | /v1/problems/{id} | Read (no hidden test cases, no right answers), edit, delete |
+| GET | /v1/problems/{id}/full | Everything, hidden test cases and right answers included (for question authors) |
 | POST | /v1/problems/{id}/scenarios | Add test cases |
 | PATCH, DELETE | /v1/problems/{id}/scenarios/{sid} | Edit or remove a test case |
 | POST | /v1/submissions | Judge code against every test case; saved with results |
 | GET | /v1/submissions/{id} | Status, verdict, score and per-test-case results |
 | GET | /v1/submissions?user_id=&problem_id= | A user's past submissions, newest first |
+| GET | /v1/stock?language= | How many approved code and QCM questions exist per language and level |
+| POST | /v1/tests | Draw and freeze one candidate's questions from a recipe |
+| GET | /v1/tests/{id} | A frozen test as the candidate sees it |
 | GET | /v1/health | Liveness and queue depth |
 
 Runs and submissions are asynchronous: `POST` returns `202` with an id, then
@@ -117,10 +121,23 @@ curl -H "Authorization: Bearer change-me" localhost:8000/v1/submissions/<submiss
 
 ## Questions
 
-Each question belongs to one language and has a difficulty level from 1 to 4
-(1 Beginner, 2 Intermediate, 3 Advanced, 4 Expert). Submissions must use the
-question's language. A question can also carry `starter_code` to pre-fill the
-editor; without it the editor starts from the language's template.
+Each question has a kind, a language and a difficulty level from 1 to 5
+(1 Beginner, 2 Intermediate, 3 Advanced, 4 Expert, 5 Master).
+
+- **code** questions are judged against their test cases. `language` is the
+  language they are solved in, and submissions must use it. A question can
+  carry `starter_code` to pre-fill the editor; without it the editor starts
+  from the language's template.
+- **qcm** questions are multiple choice: `choices` lists the options and
+  `correct_choices` the indexes of the right ones (more than one makes it a
+  multiple-answer question). Their `language` is a topic, which can be a
+  language (`python`) or anything else (`docker`). The right answers are only
+  returned by `/v1/problems/{id}/full`.
+
+Questions have a `status` (`pending`, `approved`, `rejected`, default
+`approved`) and a `timer_seconds` the candidate gets. Only approved questions
+count in the stock and go into tests. The web UI lists approved code questions
+only.
 
 Sample questions live in `examples/<language>/<slug>.json`:
 
@@ -154,6 +171,30 @@ that already exist; rebuild the `api` image first so the file is inside it), or
 by sending the same JSON to `POST /v1/problems`. `GET /v1/problems` takes
 `?language=python&level=2` to filter. A reference solution for every sample is
 in `examples/solutions/<language>/`.
+
+## Tests
+
+A test is the set of questions one candidate answers, drawn from a recipe and
+frozen when it is created:
+
+```json
+{
+  "recipe": [
+    { "language": "python", "level": 5, "code": 4, "qcm": 1 },
+    { "language": "sql", "level": 3, "code": 4 },
+    { "language": "docker", "level": 2, "qcm": 6 }
+  ],
+  "scope": "<company id>",
+  "external_ref": "<your session id>"
+}
+```
+
+Questions are picked at random among approved ones. Within one `scope`,
+questions that earlier tests did not use are picked first, and used ones only
+fill a gap. A question never appears twice in a test, and a test is never
+created short: when a row cannot be filled the answer is `409
+not_enough_questions` listing each shortage. A question that is part of a test
+cannot be deleted; reject it instead.
 
 ## Develop without Compose
 

@@ -1,18 +1,28 @@
-"""Database tables: problems, their scenarios (test cases), submissions and results."""
+"""Database tables: questions (problems), their scenarios (test cases), tests, submissions and results."""
 from __future__ import annotations
 
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import JSON, Boolean, CheckConstraint, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.db import Base
 
 
 class Problem(Base):
+    """A question. kind "code" is judged against its scenarios; kind "qcm" is multiple choice.
+
+    For code, language is the language it is solved in. For a QCM it is the
+    topic, which may be a language (python) or anything else (docker).
+    """
+
     __tablename__ = "problems"
-    __table_args__ = (CheckConstraint("level BETWEEN 1 AND 4", name="ck_problems_level"),)
+    __table_args__ = (
+        CheckConstraint("level BETWEEN 1 AND 5", name="ck_problems_level"),
+        CheckConstraint("kind IN ('code', 'qcm')", name="ck_problems_kind"),
+        CheckConstraint("status IN ('pending', 'approved', 'rejected')", name="ck_problems_status"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     slug: Mapped[str] = mapped_column(String(100), unique=True)
@@ -22,8 +32,14 @@ class Problem(Base):
     memory_limit_mb: Mapped[int] = mapped_column(Integer, default=256)
     comparator: Mapped[str] = mapped_column(String(20), default="trim")
     language: Mapped[str] = mapped_column(String(30), index=True)
-    level: Mapped[int] = mapped_column(Integer, default=1, server_default="1", index=True)  # 1 beginner .. 4 expert
-    starter_code: Mapped[str | None] = mapped_column(Text)  # None = the language's template
+    level: Mapped[int] = mapped_column(Integer, default=1, server_default="1", index=True)  # 1 beginner .. 5 master
+    kind: Mapped[str] = mapped_column(String(10), default="code", server_default="code", index=True)
+    # Only approved questions go into tests.
+    status: Mapped[str] = mapped_column(String(20), default="approved", server_default="approved", index=True)
+    timer_seconds: Mapped[int] = mapped_column(Integer, default=180, server_default="180")
+    starter_code: Mapped[str | None] = mapped_column(Text)  # code only; None = the language's template
+    choices: Mapped[list[str] | None] = mapped_column(JSON)  # qcm only
+    correct_choices: Mapped[list[int] | None] = mapped_column(JSON)  # qcm only, indexes into choices; never public
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     scenarios: Mapped[list[Scenario]] = relationship(
@@ -44,6 +60,40 @@ class Scenario(Base):
     weight: Mapped[int] = mapped_column(Integer, default=1)
 
     problem: Mapped[Problem] = relationship(back_populates="scenarios")
+
+
+class Test(Base):
+    """The questions drawn for one candidate, frozen when the test is created.
+
+    scope groups tests whose questions should not repeat (a company): new
+    tests prefer questions no earlier test in the same scope used.
+    """
+
+    __tablename__ = "tests"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    client_id: Mapped[str] = mapped_column(String(100), index=True)
+    scope: Mapped[str | None] = mapped_column(String(200), index=True)
+    external_ref: Mapped[str | None] = mapped_column(String(200), index=True)
+    recipe: Mapped[list[dict]] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    questions: Mapped[list[TestQuestion]] = relationship(
+        back_populates="test", cascade="all, delete-orphan", order_by="TestQuestion.position"
+    )
+
+
+class TestQuestion(Base):
+    __tablename__ = "test_questions"
+    __table_args__ = (UniqueConstraint("test_id", "problem_id", name="uq_test_questions_problem"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    test_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("tests.id", ondelete="CASCADE"), index=True)
+    problem_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("problems.id", ondelete="RESTRICT"), index=True)
+    position: Mapped[int] = mapped_column(Integer)
+
+    test: Mapped[Test] = relationship(back_populates="questions")
+    problem: Mapped[Problem] = relationship(lazy="joined")
 
 
 class Submission(Base):

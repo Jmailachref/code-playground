@@ -1,0 +1,18 @@
+{
+  "slug": "docker-port-publish",
+  "title": "Publish a port",
+  "kind": "qcm",
+  "language": "docker",
+  "level": 2,
+  "statement": "Which option makes container port 80 reachable on port 8080 of the host?",
+  "choices": [
+    "-p 8080:80",
+    "-p 80:8080",
+    "--expose 8080",
+    "--network host:8080"
+  ],
+  "correct_choices": [
+    0
+  ],
+  "timer_seconds": 60
+}

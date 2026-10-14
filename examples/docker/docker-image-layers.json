@@ -1,0 +1,19 @@
+{
+  "slug": "docker-image-layers",
+  "title": "What creates an image layer",
+  "kind": "qcm",
+  "language": "docker",
+  "level": 2,
+  "statement": "In a Dockerfile, which instructions add a new layer to the image? Pick every one that does.",
+  "choices": [
+    "RUN",
+    "COPY",
+    "LABEL",
+    "ENV"
+  ],
+  "correct_choices": [
+    0,
+    1
+  ],
+  "timer_seconds": 60
+}

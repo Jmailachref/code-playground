@@ -1,13 +1,14 @@
-"""The /v1 REST API: languages, playground runs, problems with scenarios, submissions."""
+"""The /v1 REST API: languages, playground runs, questions with scenarios, tests, submissions."""
 from __future__ import annotations
 
+import random
 import uuid
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
@@ -16,7 +17,7 @@ from api.auth import client_id
 from api.ui import mount_ui
 from core.db import get_session
 from core.languages import load_languages
-from core.models import Problem, Scenario, Submission
+from core.models import Problem, Scenario, Submission, Test, TestQuestion
 from core.config import settings
 from core.queue import enqueue, queue_depth
 from core.ratelimit import hit
@@ -102,21 +103,69 @@ def get_own_submission(session: Session, submission_id: uuid.UUID, client: str, 
     return submission
 
 
-def problem_out(problem: Problem) -> schemas.ProblemOut:
+def problem_fields(problem: Problem) -> dict:
     visible = [s for s in problem.scenarios if not s.hidden]
-    return schemas.ProblemOut(
+    starter = problem.starter_code
+    if problem.kind == "code" and starter is None:
+        starter = language_template(problem.language)
+    return dict(
         id=problem.id,
         slug=problem.slug,
         title=problem.title,
+        kind=problem.kind,
+        status=problem.status,
         statement=problem.statement,
+        timer_seconds=problem.timer_seconds,
         time_limit_ms=problem.time_limit_ms,
         memory_limit_mb=problem.memory_limit_mb,
         comparator=problem.comparator,
         language=problem.language,
         level=problem.level,
-        starter_code=problem.starter_code if problem.starter_code is not None else language_template(problem.language),
+        starter_code=starter,
+        choices=problem.choices,
+        multiple=len(problem.correct_choices or []) > 1,
         scenarios=[schemas.ScenarioOut.model_validate(s) for s in visible],
         hidden_scenarios=len(problem.scenarios) - len(visible),
+    )
+
+
+def problem_out(problem: Problem) -> schemas.ProblemOut:
+    return schemas.ProblemOut(**problem_fields(problem))
+
+
+def problem_full(problem: Problem) -> schemas.ProblemFull:
+    fields = problem_fields(problem)
+    fields["scenarios"] = [schemas.ScenarioOut.model_validate(s) for s in problem.scenarios]
+    return schemas.ProblemFull(**fields, correct_choices=problem.correct_choices)
+
+
+def check_question(problem: Problem) -> None:
+    """Rules that span fields, checked after a create or an update."""
+    if problem.kind == "code":
+        check_language(problem.language)
+    try:
+        schemas.check_qcm_fields(
+            problem.kind, problem.choices, problem.correct_choices, problem.scenarios if problem.kind == "qcm" else None
+        )
+    except ValueError as exc:
+        raise api_error(400, "invalid_question", str(exc))
+
+
+def get_own_test(session: Session, test_id: uuid.UUID, client: str) -> Test:
+    test = session.get(Test, test_id)
+    if test is None or test.client_id != client:
+        raise api_error(404, "test_not_found", f"no test with id {test_id}")
+    return test
+
+
+def test_out(test: Test) -> schemas.TestOut:
+    return schemas.TestOut(
+        id=test.id,
+        scope=test.scope,
+        external_ref=test.external_ref,
+        recipe=test.recipe,
+        questions=[problem_out(q.problem) for q in test.questions],
+        created_at=test.created_at,
     )
 
 
@@ -242,16 +291,22 @@ def read_run(
 @app.get("/v1/problems", response_model=list[schemas.ProblemSummary], tags=["problems"])
 def list_problems(
     language: str | None = None,
-    level: int | None = Query(default=None, ge=1, le=4),
+    level: int | None = Query(default=None, ge=1, le=5),
+    kind: schemas.Kind | None = None,
+    status: schemas.Status | None = None,
     _: str = Depends(client_id),
     session: Session = Depends(get_session),
 ) -> list[Problem]:
-    """List questions, easiest first, optionally for one language and/or level."""
+    """List questions, easiest first, optionally for one language or topic, level, kind and/or status."""
     query = select(Problem).order_by(Problem.language, Problem.level, Problem.created_at)
     if language is not None:
         query = query.where(Problem.language == language)
     if level is not None:
         query = query.where(Problem.level == level)
+    if kind is not None:
+        query = query.where(Problem.kind == kind)
+    if status is not None:
+        query = query.where(Problem.status == status)
     return list(session.scalars(query))
 
 
@@ -259,9 +314,9 @@ def list_problems(
 def create_problem(
     body: schemas.ProblemIn, _: str = Depends(client_id), session: Session = Depends(get_session)
 ) -> schemas.ProblemOut:
-    check_language(body.language)
     problem = Problem(**body.model_dump(exclude={"scenarios"}))
     problem.scenarios = [Scenario(order=i, **s.model_dump()) for i, s in enumerate(body.scenarios)]
+    check_question(problem)
     session.add(problem)
     try:
         session.commit()
@@ -277,6 +332,14 @@ def read_problem(
     return problem_out(get_problem(session, problem_id))
 
 
+@app.get("/v1/problems/{problem_id}/full", response_model=schemas.ProblemFull, tags=["problems"])
+def read_problem_full(
+    problem_id: uuid.UUID, _: str = Depends(client_id), session: Session = Depends(get_session)
+) -> schemas.ProblemFull:
+    """The whole question, hidden test cases and right answers included. Never reachable from the web UI."""
+    return problem_full(get_problem(session, problem_id))
+
+
 @app.patch("/v1/problems/{problem_id}", response_model=schemas.ProblemOut, tags=["problems"])
 def update_problem(
     problem_id: uuid.UUID,
@@ -285,10 +348,9 @@ def update_problem(
     session: Session = Depends(get_session),
 ) -> schemas.ProblemOut:
     problem = get_problem(session, problem_id)
-    if body.language is not None:
-        check_language(body.language)
     for field, value in body.model_dump(exclude_unset=True).items():
         setattr(problem, field, value)
+    check_question(problem)
     session.commit()
     return problem_out(problem)
 
@@ -298,7 +360,10 @@ def delete_problem(
     problem_id: uuid.UUID, _: str = Depends(client_id), session: Session = Depends(get_session)
 ) -> None:
     session.delete(get_problem(session, problem_id))
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        raise api_error(409, "problem_in_use", "this question is part of a test; reject it instead of deleting it")
 
 
 @app.post(
@@ -311,6 +376,8 @@ def add_scenarios(
     session: Session = Depends(get_session),
 ) -> list[Scenario]:
     problem = get_problem(session, problem_id)
+    if problem.kind != "code":
+        raise api_error(400, "invalid_question", "only code questions have scenarios")
     start = max((s.order for s in problem.scenarios), default=-1) + 1
     added = [Scenario(order=start + i, **s.model_dump()) for i, s in enumerate(body)]
     problem.scenarios.extend(added)
@@ -351,6 +418,105 @@ def delete_scenario(
     session.commit()
 
 
+# --- question stock & tests -------------------------------------------------
+
+
+@app.get("/v1/stock", response_model=list[schemas.StockOut], tags=["tests"])
+def stock(
+    language: str | None = None, _: str = Depends(client_id), session: Session = Depends(get_session)
+) -> list[schemas.StockOut]:
+    """How many approved questions exist per language (or topic) and level, by kind."""
+    query = (
+        select(Problem.language, Problem.level, Problem.kind, func.count())
+        .where(Problem.status == "approved")
+        .group_by(Problem.language, Problem.level, Problem.kind)
+    )
+    if language is not None:
+        query = query.where(Problem.language == language)
+    counts: dict[tuple[str, int], schemas.StockOut] = {}
+    for lang, level, kind, n in session.execute(query):
+        row = counts.setdefault((lang, level), schemas.StockOut(language=lang, level=level, code=0, qcm=0))
+        setattr(row, kind, n)
+    return [counts[k] for k in sorted(counts)]
+
+
+@app.post("/v1/tests", status_code=201, response_model=schemas.TestOut, tags=["tests"])
+def create_test(
+    body: schemas.TestIn, client: str = Depends(client_id), session: Session = Depends(get_session)
+) -> schemas.TestOut:
+    """Draws the questions for one candidate from the approved questions and freezes them.
+
+    Each recipe row asks for some code and some QCM questions of one language
+    (or topic) and level. Questions no earlier test in the same scope used are
+    picked first; used ones fill the gap only when there are not enough fresh
+    ones. A question never appears twice in one test, and a test is never
+    created short: if any row cannot be filled the answer is 409 with what is
+    missing.
+    """
+    used: set[uuid.UUID] = set()
+    if body.scope is not None:
+        used = set(
+            session.scalars(
+                select(TestQuestion.problem_id).join(Test).where(Test.client_id == client, Test.scope == body.scope)
+            )
+        )
+    rng = random.SystemRandom()
+    picked: list[uuid.UUID] = []
+    shortages: list[schemas.ShortRow] = []
+    for row in body.recipe:
+        for kind, needed in (("code", row.code), ("qcm", row.qcm)):
+            if needed == 0:
+                continue
+            pool = list(
+                session.scalars(
+                    select(Problem.id).where(
+                        Problem.language == row.language,
+                        Problem.level == row.level,
+                        Problem.kind == kind,
+                        Problem.status == "approved",
+                    )
+                )
+            )
+            fresh = [p for p in pool if p not in used]
+            chosen = rng.sample(fresh, min(needed, len(fresh)))
+            if len(chosen) < needed:
+                seen = [p for p in pool if p in used]
+                chosen += rng.sample(seen, min(needed - len(chosen), len(seen)))
+            if len(chosen) < needed:
+                shortages.append(
+                    schemas.ShortRow(language=row.language, level=row.level, kind=kind, needed=needed, available=len(pool))
+                )
+            picked += chosen
+    if shortages:
+        raise HTTPException(
+            409,
+            detail={
+                "code": "not_enough_questions",
+                "message": "there are not enough approved questions for this recipe",
+                "shortages": [s.model_dump() for s in shortages],
+            },
+        )
+    test = Test(
+        client_id=client,
+        scope=body.scope,
+        external_ref=body.external_ref,
+        recipe=[r.model_dump() for r in body.recipe],
+        questions=[TestQuestion(problem_id=pid, position=i) for i, pid in enumerate(picked)],
+    )
+    session.add(test)
+    session.commit()
+    session.refresh(test)
+    return test_out(test)
+
+
+@app.get("/v1/tests/{test_id}", response_model=schemas.TestOut, tags=["tests"])
+def read_test(
+    test_id: uuid.UUID, client: str = Depends(client_id), session: Session = Depends(get_session)
+) -> schemas.TestOut:
+    """The frozen test as the candidate sees it: no hidden test cases, no right answers."""
+    return test_out(get_own_test(session, test_id, client))
+
+
 # --- submissions ------------------------------------------------------------
 
 
@@ -359,6 +525,8 @@ def create_submission(
     body: schemas.SubmissionIn, client: str = Depends(client_id), session: Session = Depends(get_session)
 ) -> schemas.Accepted:
     problem = get_problem(session, body.problem_id)
+    if problem.kind != "code":
+        raise api_error(400, "not_code", "only code questions take submissions")
     check_language(body.language, problem.language)
     if not problem.scenarios:
         raise api_error(400, "no_scenarios", "this problem has no test cases yet")

@@ -1,0 +1,18 @@
+{
+  "slug": "docker-cmd-entrypoint",
+  "title": "CMD and ENTRYPOINT",
+  "kind": "qcm",
+  "language": "docker",
+  "level": 3,
+  "statement": "An image has ENTRYPOINT [\"python\"] and CMD [\"app.py\"]. What runs with `docker run image test.py`?",
+  "choices": [
+    "python test.py",
+    "python app.py",
+    "test.py",
+    "python app.py test.py"
+  ],
+  "correct_choices": [
+    0
+  ],
+  "timer_seconds": 60
+}
