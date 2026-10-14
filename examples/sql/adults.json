@@ -1,0 +1,35 @@
+{
+  "slug": "adults",
+  "title": "Adults only",
+  "language": "sql",
+  "level": 1,
+  "statement": "Table people(name TEXT, age INTEGER).\n\nReturn the name of every person aged 18 or more, sorted by name.",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 256,
+  "comparator": "trim",
+  "starter_code": "-- Table: people(name TEXT, age INTEGER)\nSELECT name\nFROM people\n-- Keep adults only and sort by name\n;\n",
+  "scenarios": [
+    {
+      "name": "Example",
+      "input": "CREATE TABLE people (name TEXT, age INTEGER);\nINSERT INTO people (name, age) VALUES\n  ('Nora', 34),\n  ('Hugo', 12),\n  ('Amina', 18),\n  ('Sami', 17);\n",
+      "expected_output": "Amina\nNora\n"
+    },
+    {
+      "name": "Nobody old enough",
+      "input": "CREATE TABLE people (name TEXT, age INTEGER);\nINSERT INTO people (name, age) VALUES\n  ('Lea', 9),\n  ('Omar', 15);\n",
+      "expected_output": ""
+    },
+    {
+      "name": "Everyone",
+      "input": "CREATE TABLE people (name TEXT, age INTEGER);\nINSERT INTO people (name, age) VALUES\n  ('Zoe', 40),\n  ('Ines', 18),\n  ('Bilal', 77);\n",
+      "expected_output": "Bilal\nInes\nZoe\n",
+      "hidden": true
+    },
+    {
+      "name": "Many people",
+      "input": "CREATE TABLE people (name TEXT, age INTEGER);\nINSERT INTO people (name, age) VALUES\n  ('Omar0', 25),\n  ('Rania0', 24),\n  ('Zoe0', 66),\n  ('Quentin0', 61),\n  ('Sami0', 81),\n  ('Tara1', 19),\n  ('Farid1', 12),\n  ('Dmitri1', 69),\n  ('Omar1', 89),\n  ('Jonas1', 82),\n  ('Bilal2', 79),\n  ('Tara2', 84),\n  ('Malik2', 21),\n  ('Omar2', 80),\n  ('Ugo2', 2),\n  ('Quentin3', 77),\n  ('Chloe3', 4),\n  ('Bilal3', 60),\n  ('Grace3', 42),\n  ('Hugo3', 57),\n  ('Sami4', 38),\n  ('Grace4', 64),\n  ('Quentin4', 1),\n  ('Hugo4', 85),\n  ('Ugo4', 11),\n  ('Omar5', 11),\n  ('Ugo5', 33),\n  ('Ines5', 41),\n  ('Nora5', 30),\n  ('Rania5', 66),\n  ('Jonas6', 14),\n  ('Amina6', 52),\n  ('Chloe6', 14),\n  ('Sami6', 38),\n  ('Zoe6', 50),\n  ('Chloe7', 61),\n  ('Amina7', 49),\n  ('Vera7', 51),\n  ('Grace7', 54),\n  ('Bilal7', 10),\n  ('Sami8', 35),\n  ('Ugo8', 44),\n  ('Grace8', 12),\n  ('Zoe8', 40),\n  ('Vera8', 43),\n  ('Amina9', 32),\n  ('Nora9', 13),\n  ('Zoe9', 2),\n  ('Dmitri9', 8),\n  ('Elena9', 60),\n  ('Paula10', 58),\n  ('Farid10', 66),\n  ('Vera10', 25),\n  ('Rania10', 17),\n  ('Grace10', 54),\n  ('Ugo11', 1),\n  ('Malik11', 35),\n  ('Dmitri11', 76),\n  ('Nora11', 39),\n  ('Grace11', 3),\n  ('Grace12', 74),\n  ('Farid12', 13),\n  ('Malik12', 6),\n  ('Tara12', 19),\n  ('Ugo12', 28),\n  ('Omar13', 43),\n  ('Ines13', 38),\n  ('Amina13', 50),\n  ('Zoe13', 10),\n  ('Tara13', 10),\n  ('Chloe14', 2),\n  ('Grace14', 77),\n  ('Sami14', 48),\n  ('Ugo14', 48),\n  ('Hugo14', 80),\n  ('Omar15', 24),\n  ('Elena15', 81),\n  ('Sami15', 20),\n  ('Paula15', 40),\n  ('Malik15', 30),\n  ('Tara16', 81),\n  ('Hugo16', 71),\n  ('Yasmine16', 26),\n  ('Grace16', 88),\n  ('Farid16', 50),\n  ('Paula17', 14),\n  ('Tara17', 14),\n  ('Chloe17', 5),\n  ('Nora17', 66),\n  ('Bilal17', 33),\n  ('Hugo18', 54),\n  ('Yasmine18', 77),\n  ('Wassim18', 63),\n  ('Malik18', 38),\n  ('Ines18', 67),\n  ('Farid19', 62),\n  ('Yasmine19', 72),\n  ('Chloe19', 84),\n  ('Elena19', 79),\n  ('Hugo19', 79);\n",
+      "expected_output": "Amina13\nAmina6\nAmina7\nAmina9\nBilal17\nBilal2\nBilal3\nChloe19\nChloe7\nDmitri1\nDmitri11\nElena15\nElena19\nElena9\nFarid10\nFarid16\nFarid19\nGrace10\nGrace12\nGrace14\nGrace16\nGrace3\nGrace4\nGrace7\nHugo14\nHugo16\nHugo18\nHugo19\nHugo3\nHugo4\nInes13\nInes18\nInes5\nJonas1\nMalik11\nMalik15\nMalik18\nMalik2\nNora11\nNora17\nNora5\nOmar0\nOmar1\nOmar13\nOmar15\nOmar2\nPaula10\nPaula15\nQuentin0\nQuentin3\nRania0\nRania5\nSami0\nSami14\nSami15\nSami4\nSami6\nSami8\nTara1\nTara12\nTara16\nTara2\nUgo12\nUgo14\nUgo5\nUgo8\nVera10\nVera7\nVera8\nWassim18\nYasmine16\nYasmine18\nYasmine19\nZoe0\nZoe6\nZoe8\n",
+      "hidden": true
+    }
+  ]
+}

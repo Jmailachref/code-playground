@@ -6,7 +6,7 @@ that other projects can call and a web UI for writing and testing code in the
 browser. This is the engine for a CodinGame-style platform.
 
 Supported languages: Python 3.13, JavaScript (Node.js 22), Java 21,
-C++20 (GCC 14), Go 1.23.
+C++20 (GCC 14), Go 1.23, SQL (SQLite 3).
 
 ## Try it in the browser (no Docker needed)
 
@@ -24,7 +24,7 @@ Needs Docker with Compose.
 ```sh
 sh languages/build.sh                                    # sandbox images, once
 docker compose up -d                                     # Postgres, Redis, API + UI on :8000, one worker
-docker compose exec api python -m api.seed examples/*/*.json  # 11 sample questions
+docker compose exec api python -m api.seed examples/*/*.json  # 15 sample questions
 open http://localhost:8000                               # web UI
 open http://localhost:8000/docs                          # interactive API docs
 ```
@@ -141,6 +141,13 @@ Sample questions live in `examples/<language>/<slug>.json`:
   ]
 }
 ```
+
+SQL questions work the same way: each test case's input is a setup script
+(`CREATE TABLE`, `INSERT`) that runs first on a fresh in-memory SQLite
+database, then the submitted queries run and every returned row is printed
+with its columns joined by `|` (NULL prints as an empty string). So the
+expected output of `SELECT name, age FROM people` is lines like `Amina|34`, and
+hidden test cases can use different data. See `examples/sql/`.
 
 Add one by dropping a file there and running the seed script (it skips slugs
 that already exist; rebuild the `api` image first so the file is inside it), or

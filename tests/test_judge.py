@@ -105,6 +105,23 @@ def test_long_output_is_compared_in_full():
     assert len(result.results[0].stdout) == 64 * 1024
 
 
+SQL_SETUP = "CREATE TABLE people (name TEXT, age INTEGER);\nINSERT INTO people VALUES ('Nora', 34), ('Hugo', NULL);\n"
+
+
+def test_sql_runs_queries_against_the_setup_script():
+    code = "SELECT name, age FROM people ORDER BY name;\nSELECT 'a;b';"
+    result = judge(get_language("sql"), code, [Scenario("people", SQL_SETUP, "Hugo|\nNora|34\na;b\n")])
+    assert result.verdict is Verdict.ACCEPTED, result.results[0]
+
+
+def test_sql_error_and_endless_query():
+    error = run("sql", "SELECT nme FROM people;", SQL_SETUP)
+    assert error.verdict is Verdict.RUNTIME_ERROR
+    assert "no such column: nme" in error.results[0].stderr
+    endless = "WITH RECURSIVE n(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM n) SELECT count(*) FROM n;"
+    assert run("sql", endless, time_limit_ms=500).verdict is Verdict.TIME_LIMIT_EXCEEDED
+
+
 def test_output_flood_is_output_limit_exceeded():
     result = run("python", "while True: print('x' * 1000)")
     assert result.verdict is Verdict.OUTPUT_LIMIT_EXCEEDED
