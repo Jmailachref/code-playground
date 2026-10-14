@@ -24,7 +24,7 @@ Needs Docker with Compose.
 ```sh
 sh languages/build.sh                                    # sandbox images, once
 docker compose up -d                                     # Postgres, Redis, API + UI on :8000, one worker
-docker compose exec api python -m api.seed examples/*/*.json  # 15 sample questions
+docker compose exec api python -m api.seed examples/*/*.json  # 140 sample questions
 open http://localhost:8000                               # web UI
 open http://localhost:8000/docs                          # interactive API docs
 ```
@@ -165,6 +165,11 @@ database, then the submitted queries run and every returned row is printed
 with its columns joined by `|` (NULL prints as an empty string). So the
 expected output of `SELECT name, age FROM people` is lines like `Amina|34`, and
 hidden test cases can use different data. See `examples/sql/`.
+
+Before adding questions, check them: `python -m api.check_examples` validates
+every file and runs each code question's reference solution
+(`examples/solutions/<language>/<slug>.<ext>`) against all its test cases in
+the sandbox; CI runs the same check.
 
 Add one by dropping a file there and running the seed script (it skips slugs
 that already exist; rebuild the `api` image first so the file is inside it), or

@@ -1,0 +1,18 @@
+{
+  "slug": "sql-type-affinity",
+  "title": "Sorting mixed types",
+  "kind": "qcm",
+  "language": "sql",
+  "level": 5,
+  "statement": "In SQLite:\n\nCREATE TABLE t (v);  -- no declared type\nINSERT INTO t VALUES (10), ('9'), (2.5), ('abc'), (NULL);\nSELECT v FROM t ORDER BY v;\n\nIn which order are the values returned?",
+  "choices": [
+    "NULL, 2.5, 9, 10, abc",
+    "2.5, 9, 10, abc, NULL",
+    "NULL, 10, 2.5, 9, abc",
+    "NULL, 2.5, 10, 9, abc"
+  ],
+  "correct_choices": [
+    3
+  ],
+  "timer_seconds": 120
+}

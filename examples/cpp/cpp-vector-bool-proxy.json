@@ -1,0 +1,18 @@
+{
+  "slug": "cpp-vector-bool-proxy",
+  "title": "auto and std::vector<bool>",
+  "kind": "qcm",
+  "language": "cpp",
+  "level": 5,
+  "statement": "What does this program print?\n\n#include <iostream>\n#include <vector>\nint main() {\n    std::vector<bool> v{false, false};\n    auto x = v[0];\n    v[0] = true;\n    std::vector<int> w{0, 0};\n    auto y = w[0];\n    w[0] = 1;\n    std::cout << x << y << \"\\n\";\n}\n",
+  "choices": [
+    "00",
+    "10",
+    "01",
+    "11"
+  ],
+  "correct_choices": [
+    1
+  ],
+  "timer_seconds": 120
+}

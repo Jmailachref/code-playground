@@ -1,0 +1,49 @@
+{
+  "slug": "js-limited-coins",
+  "title": "Limited coins",
+  "kind": "code",
+  "language": "javascript",
+  "level": 4,
+  "statement": "You have n kinds of coins. A coin of kind i is worth vi, and you own ci coins of that kind. Pay exactly S using as few coins as possible.\nInput: the first line holds n and S (1 <= n <= 100, 0 <= S <= 100000). Each of the next n lines holds vi and ci (1 <= vi <= 100000, 1 <= ci <= 1000).\nOutput: a single integer, the minimum number of coins whose values add up to exactly S, or -1 if it is impossible. Paying 0 takes 0 coins.\nTreating every single coin as a separate item is too slow for the largest tests.\n\nExample\nInput:\n3 11\n5 1\n2 5\n1 3\nOutput:\n4\n(5 + 2 + 2 + 2: only one coin of 5 is available.)",
+  "starter_code": "const data = require(\"fs\").readFileSync(0, \"utf8\").trim().split(/\\s+/).map(Number);\nconst n = data[0];\nconst s = data[1];\nconst coins = [];\nfor (let i = 0; i < n; i++) coins.push([data[2 + 2 * i], data[3 + 2 * i]]);\n// Print the minimum number of coins that pay exactly s, or -1\n",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 256,
+  "comparator": "trim",
+  "timer_seconds": 1500,
+  "scenarios": [
+    {
+      "name": "Example",
+      "input": "3 11\n5 1\n2 5\n1 3\n",
+      "expected_output": "4\n"
+    },
+    {
+      "name": "Impossible",
+      "input": "2 7\n2 10\n4 10\n",
+      "expected_output": "-1\n"
+    },
+    {
+      "name": "Pay zero",
+      "input": "1 0\n3 2\n",
+      "expected_output": "0\n",
+      "hidden": true
+    },
+    {
+      "name": "Greedy fails",
+      "input": "3 12\n9 2\n6 2\n1 10\n",
+      "expected_output": "2\n",
+      "hidden": true
+    },
+    {
+      "name": "Not enough coins",
+      "input": "1 100000\n100 999\n",
+      "expected_output": "-1\n",
+      "hidden": true
+    },
+    {
+      "name": "100 kinds, S=99999",
+      "input": "100 99999\n4792 568\n6023 776\n4058 969\n3188 508\n2134 756\n2524 543\n8098 793\n6543 754\n1052 775\n3771 971\n5118 601\n4798 715\n8358 535\n5953 703\n1662 598\n3736 827\n5540 891\n8670 547\n6051 858\n6735 796\n1335 574\n6965 588\n4104 981\n2387 811\n6762 868\n8751 990\n4702 521\n8792 527\n6939 638\n4461 784\n2287 849\n2379 810\n2949 936\n1420 576\n1908 881\n2084 637\n5147 877\n8141 794\n8568 517\n5836 562\n1518 944\n7342 861\n6639 706\n4142 986\n7468 963\n7112 621\n8268 582\n1832 812\n8528 758\n3385 522\n2679 876\n6523 687\n2837 932\n6944 845\n7496 767\n4455 802\n8287 789\n1718 896\n7328 852\n3185 544\n8466 944\n2719 677\n4248 556\n3303 942\n3798 951\n7631 799\n1353 687\n2634 731\n6806 607\n8261 705\n1043 601\n8203 984\n4368 794\n1448 881\n8338 509\n4103 694\n7928 909\n5028 811\n2139 668\n1192 500\n2939 721\n4479 557\n7031 609\n8425 613\n7969 727\n1917 638\n8897 666\n5889 917\n1031 545\n1993 657\n7261 822\n5740 645\n2619 552\n8334 764\n7981 901\n2663 528\n3705 513\n1067 695\n8311 899\n1684 786\n",
+      "expected_output": "12\n",
+      "hidden": true
+    }
+  ]
+}

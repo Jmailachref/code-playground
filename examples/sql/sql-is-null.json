@@ -1,0 +1,18 @@
+{
+  "slug": "sql-is-null",
+  "title": "Find missing emails",
+  "kind": "qcm",
+  "language": "sql",
+  "level": 1,
+  "statement": "Table users(id INTEGER, email TEXT). Some users have no email: their email is NULL.\n\nWhich WHERE clause keeps only the users whose email is NULL?",
+  "choices": [
+    "WHERE email = NULL",
+    "WHERE email IS NULL",
+    "WHERE email = ''",
+    "WHERE email == NULL"
+  ],
+  "correct_choices": [
+    1
+  ],
+  "timer_seconds": 60
+}

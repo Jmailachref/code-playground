@@ -1,0 +1,18 @@
+{
+  "slug": "java-virtual-threads",
+  "title": "Virtual threads in Java 21",
+  "kind": "qcm",
+  "language": "java",
+  "level": 5,
+  "statement": "Which statement about virtual threads in Java 21 is true?",
+  "choices": [
+    "They make CPU-bound computations faster than platform threads, because switching between them is cheaper.",
+    "They should be kept in a fixed-size pool and reused, because creating one is as costly as creating a platform thread.",
+    "When a virtual thread blocks inside a synchronized block, it stays pinned to its carrier platform thread instead of releasing it.",
+    "They cannot use ThreadLocal variables."
+  ],
+  "correct_choices": [
+    2
+  ],
+  "timer_seconds": 120
+}

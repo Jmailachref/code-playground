@@ -1,0 +1,19 @@
+{
+  "slug": "go-qcm-map-behaviour",
+  "title": "How maps behave",
+  "kind": "qcm",
+  "language": "go",
+  "level": 2,
+  "statement": "For a Go map of type map[string]int, which statements are true? Pick every one that applies.",
+  "choices": [
+    "Ranging over the map visits the keys in the order they were inserted",
+    "Reading a key that is not in the map returns 0 and does not panic",
+    "Calling delete with a key that is not in the map panics",
+    "Assigning to a key of a nil map (declared with var m map[string]int and never initialised) panics"
+  ],
+  "correct_choices": [
+    1,
+    3
+  ],
+  "timer_seconds": 60
+}

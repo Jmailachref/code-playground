@@ -1,0 +1,18 @@
+{
+  "slug": "js-qcm-object-key-order",
+  "title": "Object key order",
+  "kind": "qcm",
+  "language": "javascript",
+  "level": 4,
+  "statement": "What does this code print (Node.js 22, run as a script with node main.js)?\n\nconst o = { b: 1, 2: 1, a: 1, 1: 1, \"-1\": 1, \"01\": 1 };\nconsole.log(Object.keys(o).join(\" \"));",
+  "choices": [
+    "b 2 a 1 -1 01",
+    "1 2 b a -1 01",
+    "-1 01 1 2 a b",
+    "-1 1 2 b a 01"
+  ],
+  "correct_choices": [
+    1
+  ],
+  "timer_seconds": 120
+}

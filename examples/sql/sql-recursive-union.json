@@ -1,0 +1,19 @@
+{
+  "slug": "sql-recursive-union",
+  "title": "Recursive CTE that cycles",
+  "kind": "qcm",
+  "language": "sql",
+  "level": 4,
+  "statement": "Consider this query:\n\nWITH RECURSIVE r(n) AS (\n  SELECT 1\n  UNION\n  SELECT n % 3 + 1 FROM r\n)\nSELECT COUNT(*) FROM r;\n\nWhich statements are true in SQLite? Pick every one that applies.",
+  "choices": [
+    "It returns 3.",
+    "It never finishes: n cycles through 1, 2, 3, 1, ... forever.",
+    "With UNION ALL instead of UNION (and nothing else changed), it never finishes.",
+    "It is rejected: the recursive part of a CTE needs a WHERE clause to stop."
+  ],
+  "correct_choices": [
+    0,
+    2
+  ],
+  "timer_seconds": 120
+}

@@ -1,0 +1,18 @@
+{
+  "slug": "cpp-moved-from-string",
+  "title": "A moved-from std::string",
+  "kind": "qcm",
+  "language": "cpp",
+  "level": 4,
+  "statement": "After these lines:\n\nstd::string s = \"a fairly long string that does not fit in the small buffer\";\nstd::string t = std::move(s);\n\nwhat does the C++ standard guarantee about s?",
+  "choices": [
+    "s is in a valid but unspecified state: it can be destroyed, assigned a new value or have clear() called on it, but its contents should not be relied on",
+    "s is guaranteed to be empty",
+    "Any use of s, even assigning to it, is undefined behavior",
+    "s still holds the original text, because std::move only casts and never changes its argument"
+  ],
+  "correct_choices": [
+    0
+  ],
+  "timer_seconds": 120
+}

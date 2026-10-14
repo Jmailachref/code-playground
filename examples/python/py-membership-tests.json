@@ -1,0 +1,19 @@
+{
+  "slug": "py-membership-tests",
+  "title": "Membership tests",
+  "kind": "qcm",
+  "language": "python",
+  "level": 5,
+  "statement": "In CPython 3.13, which statements about the in operator are true? Pick every one that applies.",
+  "choices": [
+    "x in some_set is O(1) on average, because it looks x up by its hash.",
+    "1.0 in {1} is False, because 1.0 and 1 are different types.",
+    "10**9 in range(10**12) answers in constant time, without iterating over the range.",
+    "k in some_dict searches the dict's values as well as its keys."
+  ],
+  "correct_choices": [
+    0,
+    2
+  ],
+  "timer_seconds": 120
+}

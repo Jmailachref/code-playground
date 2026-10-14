@@ -1,0 +1,18 @@
+{
+  "slug": "py-eq-without-hash",
+  "title": "__eq__ without __hash__",
+  "kind": "qcm",
+  "language": "python",
+  "level": 5,
+  "statement": "What happens when this code runs?\n\nclass P:\n    def __init__(self, x):\n        self.x = x\n\n    def __eq__(self, other):\n        return self.x == other.x\n\nprint(len({P(1), P(1)}))\n",
+  "choices": [
+    "It prints 1, because the two objects are equal",
+    "It prints 2, because the default hash is based on identity",
+    "It raises TypeError: unhashable type: 'P'",
+    "It prints 0"
+  ],
+  "correct_choices": [
+    2
+  ],
+  "timer_seconds": 120
+}

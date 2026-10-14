@@ -1,0 +1,18 @@
+{
+  "slug": "sql-rank-ties",
+  "title": "RANK versus DENSE_RANK",
+  "kind": "qcm",
+  "language": "sql",
+  "level": 3,
+  "statement": "Table scores(player TEXT, points INTEGER) contains:\n  ('a', 100)\n  ('b', 100)\n  ('c', 90)\n  ('d', 80)\n\nSELECT player,\n       RANK() OVER (ORDER BY points DESC),\n       DENSE_RANK() OVER (ORDER BY points DESC)\nFROM scores;\n\nWhat are the RANK() and DENSE_RANK() values on player c's row?",
+  "choices": [
+    "3 and 2",
+    "2 and 2",
+    "3 and 3",
+    "2 and 3"
+  ],
+  "correct_choices": [
+    0
+  ],
+  "timer_seconds": 90
+}

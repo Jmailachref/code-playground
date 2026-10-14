@@ -1,0 +1,19 @@
+{
+  "slug": "sql-sum-overflow",
+  "title": "SUM, TOTAL and overflow",
+  "kind": "qcm",
+  "language": "sql",
+  "level": 5,
+  "statement": "In SQLite, table big(x INTEGER) contains two rows: 9223372036854775807 (the largest 64-bit integer) and 1.\n\nWhich statements are true? Pick every one that applies.",
+  "choices": [
+    "SELECT SUM(x) FROM big returns 9223372036854775808.",
+    "SELECT SUM(x) FROM big fails with an integer overflow error.",
+    "SELECT TOTAL(x) FROM big returns a floating-point value instead of failing.",
+    "On an empty table, SUM(x) and TOTAL(x) both return NULL."
+  ],
+  "correct_choices": [
+    1,
+    2
+  ],
+  "timer_seconds": 120
+}

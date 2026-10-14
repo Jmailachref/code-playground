@@ -1,0 +1,20 @@
+{
+  "slug": "cpp-int-initialization",
+  "title": "Initializing an int",
+  "kind": "qcm",
+  "language": "cpp",
+  "level": 1,
+  "statement": "Which of these lines are valid C++ that declare an int named a holding the value 5? Pick every one that applies.",
+  "choices": [
+    "int a := 5;",
+    "int a = 5;",
+    "int a{5};",
+    "int a(5);"
+  ],
+  "correct_choices": [
+    1,
+    2,
+    3
+  ],
+  "timer_seconds": 60
+}

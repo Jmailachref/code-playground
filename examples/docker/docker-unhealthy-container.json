@@ -1,0 +1,19 @@
+{
+  "slug": "docker-unhealthy-container",
+  "title": "When a healthcheck fails",
+  "kind": "qcm",
+  "language": "docker",
+  "level": 5,
+  "statement": "A container (plain Docker Engine, not Swarm) was started with `--restart always` and a HEALTHCHECK. Its check has now failed the configured number of retries in a row. Pick every one that applies.",
+  "choices": [
+    "Its health status becomes unhealthy and `docker ps` shows (unhealthy)",
+    "The restart policy restarts it, since an unhealthy container counts as failed",
+    "It keeps running; Docker Engine itself takes no action on it",
+    "Docker sends it SIGTERM, then SIGKILL after the stop timeout"
+  ],
+  "correct_choices": [
+    0,
+    2
+  ],
+  "timer_seconds": 120
+}

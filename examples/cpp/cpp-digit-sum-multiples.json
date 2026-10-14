@@ -1,0 +1,49 @@
+{
+  "slug": "cpp-digit-sum-multiples",
+  "title": "Digit sums divisible by K",
+  "kind": "code",
+  "language": "cpp",
+  "level": 5,
+  "statement": "Count the integers x with A <= x <= B whose digit sum is divisible by K. The digit sum of x is the sum of its decimal digits (the digit sum of 0 is 0, which is divisible by every K).\n\nInput: one line with A B K (0 <= A <= B <= 10^18, 1 <= K <= 100).\nOutput: one line with the count.\n\nThe range can hold 10^18 numbers, so testing them one by one is far too slow.\n\nExample\nInput:\n0 20 5\nOutput:\n4\n(0, 5, 14 and 19)",
+  "starter_code": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    long long A, B;\n    int K;\n    cin >> A >> B >> K;\n    // Print how many x in [A, B] have a digit sum divisible by K\n}\n",
+  "time_limit_ms": 1000,
+  "memory_limit_mb": 256,
+  "comparator": "trim",
+  "timer_seconds": 1800,
+  "scenarios": [
+    {
+      "name": "Example",
+      "input": "0 20 5\n",
+      "expected_output": "4\n"
+    },
+    {
+      "name": "Single number",
+      "input": "1000000000000000000 1000000000000000000 1\n",
+      "expected_output": "1\n"
+    },
+    {
+      "name": "Single number, no match",
+      "input": "38 38 10\n",
+      "expected_output": "0\n",
+      "hidden": true
+    },
+    {
+      "name": "K = 1 counts everything",
+      "input": "123456789 987654321012 1\n",
+      "expected_output": "987530864224\n",
+      "hidden": true
+    },
+    {
+      "name": "Full range",
+      "input": "0 1000000000000000000 7\n",
+      "expected_output": "142857142856594042\n",
+      "hidden": true
+    },
+    {
+      "name": "Large K",
+      "input": "314159265358979 271828182845904523 100\n",
+      "expected_output": "1397064888839393\n",
+      "hidden": true
+    }
+  ]
+}

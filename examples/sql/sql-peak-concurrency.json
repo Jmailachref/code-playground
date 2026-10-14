@@ -1,0 +1,44 @@
+{
+  "slug": "sql-peak-concurrency",
+  "title": "Peak concurrent calls",
+  "kind": "code",
+  "language": "sql",
+  "level": 5,
+  "statement": "Table calls(id INTEGER PRIMARY KEY, server TEXT, start_sec INTEGER, end_sec INTEGER), with start_sec < end_sec. A call is active from start_sec (included) to end_sec (excluded), so a call ending at t and another starting at t are never active together.\n\nFor each server, return the server, its peak (the largest number of its calls active at the same instant) and first_at, the earliest instant at which that peak is reached. Sort by peak, highest first, then by server.\n\nOutput: columns server, peak, first_at.\nConstraints: up to 20000 calls, times from 0 to 100000. Comparing every pair of calls is too slow for the largest tests.\n\nExample\ncalls:\n  (1, 'eu', 0, 10)\n  (2, 'eu', 5, 15)\n  (3, 'eu', 10, 20)\n  (4, 'eu', 12, 14)\n  (5, 'us', 0, 5)\n  (6, 'us', 5, 10)\nOutput:\neu|3|12\nus|1|0\n\n(At 10, call 1 has ended when call 3 starts, so only 2 calls are active; at 12, calls 2, 3 and 4 are.)",
+  "starter_code": "-- Table: calls(id INTEGER PRIMARY KEY, server TEXT, start_sec INTEGER, end_sec INTEGER)\nSELECT\n;\n",
+  "time_limit_ms": 2000,
+  "memory_limit_mb": 256,
+  "comparator": "trim",
+  "timer_seconds": 1800,
+  "scenarios": [
+    {
+      "name": "Example",
+      "input": "CREATE TABLE calls (id INTEGER PRIMARY KEY, server TEXT, start_sec INTEGER, end_sec INTEGER);\nINSERT INTO calls (id, server, start_sec, end_sec) VALUES\n  (1, 'eu', 0, 10),\n  (2, 'eu', 5, 15),\n  (3, 'eu', 10, 20),\n  (4, 'eu', 12, 14),\n  (5, 'us', 0, 5),\n  (6, 'us', 5, 10);\n",
+      "expected_output": "eu|3|12\nus|1|0\n"
+    },
+    {
+      "name": "Back to back",
+      "input": "CREATE TABLE calls (id INTEGER PRIMARY KEY, server TEXT, start_sec INTEGER, end_sec INTEGER);\nINSERT INTO calls (id, server, start_sec, end_sec) VALUES\n  (1, 'ap', 30, 40),\n  (2, 'ap', 10, 20),\n  (3, 'ap', 20, 30),\n  (4, 'ap', 40, 41);\n",
+      "expected_output": "ap|1|10\n",
+      "hidden": true
+    },
+    {
+      "name": "Peak reached twice",
+      "input": "CREATE TABLE calls (id INTEGER PRIMARY KEY, server TEXT, start_sec INTEGER, end_sec INTEGER);\nINSERT INTO calls (id, server, start_sec, end_sec) VALUES\n  (1, 'x', 0, 4),\n  (2, 'x', 2, 6),\n  (3, 'x', 6, 9),\n  (4, 'x', 7, 8),\n  (5, 'y', 3, 9),\n  (6, 'y', 3, 9);\n",
+      "expected_output": "x|2|2\ny|2|3\n",
+      "hidden": true
+    },
+    {
+      "name": "Random servers",
+      "input": "CREATE TABLE calls (id INTEGER PRIMARY KEY, server TEXT, start_sec INTEGER, end_sec INTEGER);\nINSERT INTO calls (id, server, start_sec, end_sec) VALUES\n  (1, 's3', 8, 14),\n  (2, 's3', 20, 21),\n  (3, 's1', 14, 15),\n  (4, 's1', 5, 11),\n  (5, 's1', 15, 22),\n  (6, 's1', 17, 21),\n  (7, 's3', 0, 4),\n  (8, 's2', 13, 16),\n  (9, 's1', 12, 14),\n  (10, 's3', 4, 12);\n",
+      "expected_output": "s1|2|17\ns3|2|8\ns2|1|13\n",
+      "hidden": true
+    },
+    {
+      "name": "15000 calls",
+      "input": "CREATE TABLE calls (id INTEGER PRIMARY KEY, server TEXT, start_sec INTEGER, end_sec INTEGER);\nINSERT INTO calls (id, server, start_sec, end_sec)\nWITH RECURSIVE n(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM n WHERE i < 15000),\nc(i, s, len) AS (SELECT i, (i * 7919 % 8640) * 10, 10 * (1 + i * 131 % (30 + 15 * (i * 11 % 5))) FROM n)\nSELECT i, 'srv' || (i * 11 % 5), s, s + len FROM c;\n",
+      "expected_output": "srv4|19|23860\nsrv3|16|1820\nsrv2|14|16280\nsrv1|10|490\nsrv0|8|300\n",
+      "hidden": true
+    }
+  ]
+}

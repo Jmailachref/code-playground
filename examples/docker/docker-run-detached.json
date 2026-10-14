@@ -1,0 +1,18 @@
+{
+  "slug": "docker-run-detached",
+  "title": "Run a container in the background",
+  "kind": "qcm",
+  "language": "docker",
+  "level": 1,
+  "statement": "You want `docker run nginx` to start the container and give your terminal back immediately, printing only the container ID. Which flag do you add?",
+  "choices": [
+    "-it",
+    "--rm",
+    "-d",
+    "--init"
+  ],
+  "correct_choices": [
+    2
+  ],
+  "timer_seconds": 60
+}

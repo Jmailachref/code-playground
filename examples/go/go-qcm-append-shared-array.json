@@ -1,0 +1,18 @@
+{
+  "slug": "go-qcm-append-shared-array",
+  "title": "Append and the backing array",
+  "kind": "qcm",
+  "language": "go",
+  "level": 2,
+  "statement": "What does this Go program print?\n\npackage main\n\nimport \"fmt\"\n\nfunc main() {\n\ts := make([]int, 3, 5)\n\tt := append(s, 4)\n\tt[0] = 9\n\tfmt.Println(s[0], len(s), len(t))\n}",
+  "choices": [
+    "0 3 4",
+    "9 4 4",
+    "9 3 4",
+    "0 3 3"
+  ],
+  "correct_choices": [
+    2
+  ],
+  "timer_seconds": 60
+}

@@ -1,0 +1,18 @@
+{
+  "slug": "py-late-binding-closures",
+  "title": "Late-binding closures",
+  "kind": "qcm",
+  "language": "python",
+  "level": 3,
+  "statement": "What does this code print?\n\nfuncs = [lambda: i for i in range(3)]\nprint([f() for f in funcs])\n",
+  "choices": [
+    "[0, 1, 2]",
+    "[2, 2, 2]",
+    "[0, 0, 0]",
+    "It raises NameError"
+  ],
+  "correct_choices": [
+    1
+  ],
+  "timer_seconds": 90
+}

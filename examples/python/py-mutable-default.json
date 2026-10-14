@@ -1,0 +1,18 @@
+{
+  "slug": "py-mutable-default",
+  "title": "Mutable default argument",
+  "kind": "qcm",
+  "language": "python",
+  "level": 2,
+  "statement": "What does this code print?\n\ndef add(item, bucket=[]):\n    bucket.append(item)\n    return bucket\n\nprint(add(1), add(2))\n",
+  "choices": [
+    "[1] [2]",
+    "[1] [1, 2]",
+    "It raises TypeError",
+    "[1, 2] [1, 2]"
+  ],
+  "correct_choices": [
+    3
+  ],
+  "timer_seconds": 60
+}

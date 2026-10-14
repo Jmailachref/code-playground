@@ -1,0 +1,18 @@
+{
+  "slug": "docker-compose-depends-on",
+  "title": "What depends_on waits for",
+  "kind": "qcm",
+  "language": "docker",
+  "level": 4,
+  "statement": "In compose.yaml, service web has `depends_on: [db]` (short syntax) and db is postgres:16 with no healthcheck. What does `docker compose up` guarantee?",
+  "choices": [
+    "web is started only after Postgres accepts connections",
+    "db's container is started before web's container, but Postgres may not be ready to accept connections yet",
+    "web and db start in parallel; depends_on only affects the order of `docker compose down`",
+    "web is restarted automatically until it manages to connect to db"
+  ],
+  "correct_choices": [
+    1
+  ],
+  "timer_seconds": 120
+}

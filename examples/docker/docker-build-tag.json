@@ -1,0 +1,18 @@
+{
+  "slug": "docker-build-tag",
+  "title": "Build and tag an image",
+  "kind": "qcm",
+  "language": "docker",
+  "level": 1,
+  "statement": "The current directory contains a Dockerfile. Which command builds it into an image named myapp:1.0?",
+  "choices": [
+    "docker build myapp:1.0",
+    "docker build -t myapp:1.0 .",
+    "docker run -t myapp:1.0 .",
+    "docker image create myapp:1.0 ."
+  ],
+  "correct_choices": [
+    1
+  ],
+  "timer_seconds": 60
+}

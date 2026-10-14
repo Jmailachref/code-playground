@@ -1,0 +1,18 @@
+{
+  "slug": "sql-order-limit",
+  "title": "Oldest two people",
+  "kind": "qcm",
+  "language": "sql",
+  "level": 1,
+  "statement": "Table people(name TEXT, age INTEGER) contains:\n  ('Amina', 34)\n  ('Bilal', 19)\n  ('Chloe', 41)\n  ('Dmitri', 27)\n\nWhat does this query return?\n\nSELECT name FROM people ORDER BY age DESC LIMIT 2;",
+  "choices": [
+    "Amina, then Chloe",
+    "Bilal, then Dmitri",
+    "Chloe, then Amina",
+    "Chloe, then Dmitri"
+  ],
+  "correct_choices": [
+    2
+  ],
+  "timer_seconds": 60
+}

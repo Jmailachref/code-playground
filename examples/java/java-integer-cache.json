@@ -1,0 +1,18 @@
+{
+  "slug": "java-integer-cache",
+  "title": "Boxed integer comparison",
+  "kind": "qcm",
+  "language": "java",
+  "level": 2,
+  "statement": "What does this code print with a default JVM configuration?\n\nInteger a = 127, b = 127;\nInteger c = 128, d = 128;\nSystem.out.println((a == b) + \" \" + (c == d));",
+  "choices": [
+    "true true",
+    "true false",
+    "false false",
+    "It does not compile: == cannot compare Integer objects"
+  ],
+  "correct_choices": [
+    1
+  ],
+  "timer_seconds": 60
+}

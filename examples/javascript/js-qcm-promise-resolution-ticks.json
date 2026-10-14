@@ -1,0 +1,18 @@
+{
+  "slug": "js-qcm-promise-resolution-ticks",
+  "title": "Returning a promise from then",
+  "kind": "qcm",
+  "language": "javascript",
+  "level": 5,
+  "statement": "What does this code print, one letter per line (Node.js 22, run as a script with node main.js)?\n\nPromise.resolve()\n  .then(() => { console.log(\"a\"); return Promise.resolve(); })\n  .then(() => console.log(\"b\"));\nPromise.resolve()\n  .then(() => console.log(\"c\"))\n  .then(() => console.log(\"d\"))\n  .then(() => console.log(\"e\"))\n  .then(() => console.log(\"f\"));",
+  "choices": [
+    "a c b d e f",
+    "a b c d e f",
+    "a c d b e f",
+    "a c d e b f"
+  ],
+  "correct_choices": [
+    3
+  ],
+  "timer_seconds": 120
+}

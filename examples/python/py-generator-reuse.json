@@ -1,0 +1,18 @@
+{
+  "slug": "py-generator-reuse",
+  "title": "Reusing a generator",
+  "kind": "qcm",
+  "language": "python",
+  "level": 3,
+  "statement": "What does this code print?\n\ng = (x * x for x in range(3))\nprint(sum(g), sum(g))\n",
+  "choices": [
+    "5 5",
+    "It raises StopIteration",
+    "5 0",
+    "0 0"
+  ],
+  "correct_choices": [
+    2
+  ],
+  "timer_seconds": 90
+}

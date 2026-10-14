@@ -1,0 +1,18 @@
+{
+  "slug": "go-qcm-method-value",
+  "title": "Method values",
+  "kind": "qcm",
+  "language": "go",
+  "level": 5,
+  "statement": "What does this Go program print?\n\npackage main\n\nimport \"fmt\"\n\ntype T struct{ n int }\n\nfunc (t T) Show() { fmt.Println(t.n) }\n\nfunc main() {\n\tt := T{n: 1}\n\tshow := t.Show\n\tt.n = 2\n\tshow()\n}",
+  "choices": [
+    "2",
+    "0",
+    "Nothing: it does not compile because a method value needs a pointer receiver",
+    "1"
+  ],
+  "correct_choices": [
+    3
+  ],
+  "timer_seconds": 120
+}
